@@ -62,6 +62,12 @@ class AIMessage {
 }
 
 class AppState extends ChangeNotifier {
+  static const int _maxActivityCount = 12;
+  static const int _maxActivityPreviewLength = 14;
+  static const String _addTaskActivityPrefix = '新增任务「';
+  static const String _aiActivityPrefix = 'AI 助手处理了指令：';
+  static const String _autoTaskIdPrefix = 't-auto-';
+
   final List<TaskItem> _tasks = [
     TaskItem(
       id: 't-1',
@@ -109,11 +115,12 @@ class AppState extends ChangeNotifier {
     WorkspaceMember(name: '赵可', role: '产品经理', online: true),
   ];
 
-  final List<WorkspaceActivity> activities = const [
+  static const List<WorkspaceActivity> _seedActivities = [
     WorkspaceActivity(title: '张怡博更新了任务状态', time: '10 分钟前'),
     WorkspaceActivity(title: '王行健创建了 Sprint 规划', time: '今天 09:20'),
     WorkspaceActivity(title: '测试组提交了审核反馈', time: '昨天 18:40'),
   ];
+  final List<WorkspaceActivity> _activities = [..._seedActivities];
 
   final List<String> promptTemplates = const [
     '生成测试步骤',
@@ -128,9 +135,11 @@ class AppState extends ChangeNotifier {
       time: DateTime(2026, 4, 9, 9, 30),
     ),
   ];
+  int _taskCounter = 0;
 
   List<TaskItem> get tasks => List.unmodifiable(_tasks);
   List<AIMessage> get aiMessages => List.unmodifiable(_messages);
+  List<WorkspaceActivity> get activities => List.unmodifiable(_activities);
 
   int get activeProjectCount => _tasks.map((task) => task.project).toSet().length;
 
@@ -202,10 +211,32 @@ class AppState extends ChangeNotifier {
     return result;
   }
 
+  bool addTask(String title) {
+    final content = title.trim();
+    if (content.isEmpty) {
+      return false;
+    }
+
+    _tasks.insert(
+      0,
+      TaskItem(
+        id: _nextTaskId(),
+        title: content,
+        project: '快速记录',
+        priority: TaskPriority.medium,
+        dueText: '待安排',
+      ),
+    );
+    _addActivity('$_addTaskActivityPrefix$content」');
+    notifyListeners();
+    return true;
+  }
+
   void toggleTask(String id) {
     for (final task in _tasks) {
       if (task.id == id) {
         task.done = !task.done;
+        _addActivity(task.done ? '任务「${task.title}」已完成' : '任务「${task.title}」重新开启');
         notifyListeners();
         return;
       }
@@ -232,7 +263,23 @@ class AppState extends ChangeNotifier {
         time: DateTime.now(),
       ),
     );
+    final shortText = content.length > _maxActivityPreviewLength
+        ? '${content.substring(0, _maxActivityPreviewLength)}...'
+        : content;
+    _addActivity('$_aiActivityPrefix$shortText');
     notifyListeners();
+  }
+
+  void _addActivity(String title) {
+    _activities.insert(0, WorkspaceActivity(title: title, time: '刚刚'));
+    if (_activities.length > _maxActivityCount) {
+      _activities.removeLast();
+    }
+  }
+
+  String _nextTaskId() {
+    _taskCounter++;
+    return '$_autoTaskIdPrefix$_taskCounter';
   }
 
   String _buildReply(String input) {
