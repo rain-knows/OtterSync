@@ -17,6 +17,7 @@ void main() {
 
       expect(created, isTrue);
       expect(state.tasks.length, before + 1);
+      expect(state.tasks.first.title, '新增复杂任务');
       expect(state.tasks.first.status, TaskStatus.backlog);
     });
 

@@ -60,7 +60,7 @@ class TaskItem {
   final String id;
   final String title;
   final String projectId;
-  final String assigneeId;
+  String assigneeId;
   final TaskPriority priority;
   final String dueText;
   TaskStatus status;
@@ -292,7 +292,7 @@ class AppState extends ChangeNotifier {
     WorkspaceAudit(action: 'AI 建议执行', operator: '王行健', scope: 'AI 辅助任务流原型', time: '今天 10:10'),
     WorkspaceAudit(action: '风险任务复核', operator: '林雯', scope: 'OtterSync 移动端适配', time: '昨天 17:45'),
   ];
-  final List<WorkspaceAudit> _audits = [..._seedAudits];
+  final List<WorkspaceAudit> _audits = List.from(_seedAudits);
 
   final List<String> promptTemplates = const [
     '生成测试步骤',
@@ -509,6 +509,7 @@ class AppState extends ChangeNotifier {
     if (task == null) {
       return;
     }
+    task.assigneeId = memberId;
     task.history.insert(0, TaskHistoryEntry(message: '负责人调整为 ${memberNameById(memberId)}', time: DateTime.now()));
     _addActivity('任务「${task.title}」重新分配给 ${memberNameById(memberId)}');
     _addAudit('任务分配', memberNameById(memberId), projectNameById(task.projectId));

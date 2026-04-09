@@ -297,7 +297,7 @@ class _QuickAddCard extends StatelessWidget {
                 controller: controller,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
-                  hintText: '快速创建流程任务并纳入状态跟踪...',
+                  hintText: '快速创建任务并纳入流程跟踪...',
                 ),
                 onChanged: onChanged,
                 onSubmitted: (_) {
