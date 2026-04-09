@@ -13,6 +13,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   _TaskFilter _filter = _TaskFilter.pending;
   final TextEditingController _quickAddController = TextEditingController();
+  bool _canQuickAdd = false;
 
   @override
   void dispose() {
@@ -26,12 +27,12 @@ class _HomeViewState extends State<HomeView> {
       return;
     }
     _quickAddController.clear();
+    setState(() => _canQuickAdd = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
-    final canQuickAdd = _quickAddController.text.trim().isNotEmpty;
 
     final tasks = switch (_filter) {
       _TaskFilter.all => appState.tasks,
@@ -75,16 +76,17 @@ class _HomeViewState extends State<HomeView> {
                       border: InputBorder.none,
                       hintText: '快速新增一条待办...',
                     ),
-                    onChanged: (_) => setState(() {}),
+                    onChanged: (value) =>
+                        setState(() => _canQuickAdd = value.trim().isNotEmpty),
                     onSubmitted: (_) {
-                      if (canQuickAdd) {
+                      if (_canQuickAdd) {
                         _addQuickTask(appState);
                       }
                     },
                   ),
                 ),
                 FilledButton(
-                  onPressed: canQuickAdd ? () => _addQuickTask(appState) : null,
+                  onPressed: _canQuickAdd ? () => _addQuickTask(appState) : null,
                   child: const Text('新增'),
                 ),
               ],
