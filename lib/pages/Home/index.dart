@@ -12,10 +12,27 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   _TaskFilter _filter = _TaskFilter.pending;
+  final TextEditingController _quickAddController = TextEditingController();
+
+  @override
+  void dispose() {
+    _quickAddController.dispose();
+    super.dispose();
+  }
+
+  void _addQuickTask(AppState appState) {
+    final added = appState.addTask(_quickAddController.text);
+    if (!added) {
+      return;
+    }
+    _quickAddController.clear();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
+    final canQuickAdd = _quickAddController.text.trim().isNotEmpty;
 
     final tasks = switch (_filter) {
       _TaskFilter.all => appState.tasks,
@@ -46,6 +63,35 @@ class _HomeViewState extends State<HomeView> {
             .toList(),
         const SizedBox(height: 8),
         const _SectionTitle(title: '我的待办'),
+        const SizedBox(height: 12),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _quickAddController,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: '快速新增一条待办...',
+                    ),
+                    onChanged: (_) => setState(() {}),
+                    onSubmitted: (_) {
+                      if (canQuickAdd) {
+                        _addQuickTask(appState);
+                      }
+                    },
+                  ),
+                ),
+                FilledButton(
+                  onPressed: canQuickAdd ? () => _addQuickTask(appState) : null,
+                  child: const Text('新增'),
+                ),
+              ],
+            ),
+          ),
+        ),
         const SizedBox(height: 12),
         Wrap(
           spacing: 8,

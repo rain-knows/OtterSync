@@ -82,11 +82,19 @@ class WorkspaceView extends StatelessWidget {
         const SizedBox(height: 10),
         const _SectionTitle(title: '最近动态'),
         const SizedBox(height: 12),
-        ...appState.activities
-            .map(
-              (item) => _ActivityTile(title: item.title, time: item.time),
-            )
-            .toList(),
+        if (appState.activities.isEmpty)
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('暂无动态，完成任务或发起 AI 指令后会自动记录。'),
+            ),
+          )
+        else
+          ...appState.activities
+              .map(
+                (item) => _ActivityTile(title: item.title, time: item.time),
+              )
+              .toList(),
       ],
     );
   }

@@ -109,7 +109,7 @@ class AppState extends ChangeNotifier {
     WorkspaceMember(name: '赵可', role: '产品经理', online: true),
   ];
 
-  final List<WorkspaceActivity> activities = const [
+  final List<WorkspaceActivity> _activities = [
     WorkspaceActivity(title: '张怡博更新了任务状态', time: '10 分钟前'),
     WorkspaceActivity(title: '王行健创建了 Sprint 规划', time: '今天 09:20'),
     WorkspaceActivity(title: '测试组提交了审核反馈', time: '昨天 18:40'),
@@ -131,6 +131,7 @@ class AppState extends ChangeNotifier {
 
   List<TaskItem> get tasks => List.unmodifiable(_tasks);
   List<AIMessage> get aiMessages => List.unmodifiable(_messages);
+  List<WorkspaceActivity> get activities => List.unmodifiable(_activities);
 
   int get activeProjectCount => _tasks.map((task) => task.project).toSet().length;
 
@@ -202,10 +203,32 @@ class AppState extends ChangeNotifier {
     return result;
   }
 
+  bool addTask(String title) {
+    final content = title.trim();
+    if (content.isEmpty) {
+      return false;
+    }
+
+    _tasks.insert(
+      0,
+      TaskItem(
+        id: 't-${DateTime.now().microsecondsSinceEpoch}',
+        title: content,
+        project: '快速记录',
+        priority: TaskPriority.medium,
+        dueText: '待安排',
+      ),
+    );
+    _addActivity('新增任务「$content」');
+    notifyListeners();
+    return true;
+  }
+
   void toggleTask(String id) {
     for (final task in _tasks) {
       if (task.id == id) {
         task.done = !task.done;
+        _addActivity(task.done ? '任务「${task.title}」已完成' : '任务「${task.title}」重新开启');
         notifyListeners();
         return;
       }
@@ -232,7 +255,18 @@ class AppState extends ChangeNotifier {
         time: DateTime.now(),
       ),
     );
+    final shortText = content.length > 14
+        ? '${content.substring(0, 14)}...'
+        : content;
+    _addActivity('AI 助手处理了指令：$shortText');
     notifyListeners();
+  }
+
+  void _addActivity(String title) {
+    _activities.insert(0, WorkspaceActivity(title: title, time: '刚刚'));
+    if (_activities.length > 12) {
+      _activities.removeLast();
+    }
   }
 
   String _buildReply(String input) {
