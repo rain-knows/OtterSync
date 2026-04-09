@@ -64,6 +64,9 @@ class AIMessage {
 class AppState extends ChangeNotifier {
   static const int _maxActivityCount = 12;
   static const int _maxActivityPreviewLength = 14;
+  static const String _addTaskActivityPrefix = '新增任务「';
+  static const String _aiActivityPrefix = 'AI 助手处理了指令：';
+  static const String _autoTaskIdPrefix = 't-auto-';
 
   final List<TaskItem> _tasks = [
     TaskItem(
@@ -132,6 +135,7 @@ class AppState extends ChangeNotifier {
       time: DateTime(2026, 4, 9, 9, 30),
     ),
   ];
+  int _taskCounter = 0;
 
   List<TaskItem> get tasks => List.unmodifiable(_tasks);
   List<AIMessage> get aiMessages => List.unmodifiable(_messages);
@@ -216,14 +220,14 @@ class AppState extends ChangeNotifier {
     _tasks.insert(
       0,
       TaskItem(
-        id: 't-${DateTime.now().microsecondsSinceEpoch}',
+        id: _nextTaskId(),
         title: content,
         project: '快速记录',
         priority: TaskPriority.medium,
         dueText: '待安排',
       ),
     );
-    _addActivity('新增任务「$content」');
+    _addActivity('$_addTaskActivityPrefix$content」');
     notifyListeners();
     return true;
   }
@@ -262,7 +266,7 @@ class AppState extends ChangeNotifier {
     final shortText = content.length > _maxActivityPreviewLength
         ? '${content.substring(0, _maxActivityPreviewLength)}...'
         : content;
-    _addActivity('AI 助手处理了指令：$shortText');
+    _addActivity('$_aiActivityPrefix$shortText');
     notifyListeners();
   }
 
@@ -271,6 +275,11 @@ class AppState extends ChangeNotifier {
     if (_activities.length > _maxActivityCount) {
       _activities.removeLast();
     }
+  }
+
+  String _nextTaskId() {
+    _taskCounter++;
+    return '$_autoTaskIdPrefix$_taskCounter';
   }
 
   String _buildReply(String input) {

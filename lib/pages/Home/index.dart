@@ -26,7 +26,6 @@ class _HomeViewState extends State<HomeView> {
       return;
     }
     _quickAddController.clear();
-    setState(() {});
   }
 
   @override
