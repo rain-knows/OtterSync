@@ -62,6 +62,9 @@ class AIMessage {
 }
 
 class AppState extends ChangeNotifier {
+  static const int _maxActivityCount = 12;
+  static const int _maxActivityPreviewLength = 14;
+
   final List<TaskItem> _tasks = [
     TaskItem(
       id: 't-1',
@@ -109,11 +112,12 @@ class AppState extends ChangeNotifier {
     WorkspaceMember(name: '赵可', role: '产品经理', online: true),
   ];
 
-  final List<WorkspaceActivity> _activities = [
+  static const List<WorkspaceActivity> _seedActivities = [
     WorkspaceActivity(title: '张怡博更新了任务状态', time: '10 分钟前'),
     WorkspaceActivity(title: '王行健创建了 Sprint 规划', time: '今天 09:20'),
     WorkspaceActivity(title: '测试组提交了审核反馈', time: '昨天 18:40'),
   ];
+  final List<WorkspaceActivity> _activities = [..._seedActivities];
 
   final List<String> promptTemplates = const [
     '生成测试步骤',
@@ -255,8 +259,8 @@ class AppState extends ChangeNotifier {
         time: DateTime.now(),
       ),
     );
-    final shortText = content.length > 14
-        ? '${content.substring(0, 14)}...'
+    final shortText = content.length > _maxActivityPreviewLength
+        ? '${content.substring(0, _maxActivityPreviewLength)}...'
         : content;
     _addActivity('AI 助手处理了指令：$shortText');
     notifyListeners();
@@ -264,7 +268,7 @@ class AppState extends ChangeNotifier {
 
   void _addActivity(String title) {
     _activities.insert(0, WorkspaceActivity(title: title, time: '刚刚'));
-    if (_activities.length > 12) {
+    if (_activities.length > _maxActivityCount) {
       _activities.removeLast();
     }
   }
