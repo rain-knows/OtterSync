@@ -1,25 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:ottersync/state/app_state.dart';
 
-class AIView extends StatelessWidget {
+class AIView extends StatefulWidget {
   const AIView({super.key});
 
   @override
+  State<AIView> createState() => _AIViewState();
+}
+
+class _AIViewState extends State<AIView> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _send(AppState appState) {
+    final text = _controller.text;
+    appState.sendAiMessage(text);
+    _controller.clear();
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      children: const [
-        _AIHero(),
-        SizedBox(height: 20),
-        _PromptRow(),
-        SizedBox(height: 20),
-        _Bubble(isMe: false, text: '我可以帮助你生成测试步骤、梳理任务依赖、总结日报，或将自然语言转成系统操作建议。'),
-        _Bubble(isMe: true, text: '帮我拆分 “移动端页面框架搭建” 这个 Story，并给出优先级建议。'),
-        _Bubble(
-          isMe: false,
-          text: '建议优先完成底部导航、项目首页、AI 页面、Dashboard 占位图表，再补任务详情与权限管理细节。',
+    final appState = AppStateScope.of(context);
+
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            children: [
+              const _AIHero(),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: appState.promptTemplates
+                    .map(
+                      (item) => ActionChip(
+                        label: Text(item),
+                        onPressed: () => appState.sendPrompt(item),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 20),
+              ...appState.aiMessages
+                  .map(
+                    (message) => _Bubble(isMe: message.isMine, text: message.text),
+                  )
+                  .toList(),
+              const SizedBox(height: 10),
+            ],
+          ),
         ),
-        SizedBox(height: 20),
-        _InputBar(),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+          child: _InputBar(
+            controller: _controller,
+            onChanged: (_) => setState(() {}),
+            onSend: () => _send(appState),
+          ),
+        ),
       ],
     );
   }
@@ -57,33 +107,11 @@ class _AIHero extends StatelessWidget {
           ),
           SizedBox(height: 12),
           Text(
-            '后续这里可接入自然语言问答、测试用例生成、代码建议、任务流转触发等能力。',
+            '支持自然语言问答、测试用例建议、风险总结与日报草稿生成。',
             style: TextStyle(color: Color(0xFFD8E9ED), height: 1.5),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _PromptRow extends StatelessWidget {
-  const _PromptRow();
-
-  @override
-  Widget build(BuildContext context) {
-    const prompts = ['生成测试步骤', '总结 Sprint 风险', '输出日报草稿'];
-
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: prompts
-          .map(
-            (item) => Chip(
-              label: Text(item),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            ),
-          )
-          .toList(),
     );
   }
 }
@@ -105,7 +133,7 @@ class _Bubble extends StatelessWidget {
       child: Align(
         alignment: alignment,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 240),
           curve: Curves.easeOutCubic,
           constraints: const BoxConstraints(maxWidth: 290),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -121,10 +149,20 @@ class _Bubble extends StatelessWidget {
 }
 
 class _InputBar extends StatelessWidget {
-  const _InputBar();
+  const _InputBar({
+    required this.controller,
+    required this.onChanged,
+    required this.onSend,
+  });
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onSend;
 
   @override
   Widget build(BuildContext context) {
+    final canSend = controller.text.trim().isNotEmpty;
+
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -134,13 +172,25 @@ class _InputBar extends StatelessWidget {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          const Expanded(
-            child: Text(
-              '输入你的问题或操作指令...',
-              style: TextStyle(color: Color(0xFF8A99A0)),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: '输入你的问题或操作指令...',
+              ),
+              onChanged: onChanged,
+              onSubmitted: (_) {
+                if (canSend) {
+                  onSend();
+                }
+              },
             ),
           ),
-          FilledButton(onPressed: () {}, child: const Text('发送')),
+          FilledButton(
+            onPressed: canSend ? onSend : null,
+            child: const Text('发送'),
+          ),
         ],
       ),
     );
