@@ -304,7 +304,7 @@ class AppState extends ChangeNotifier {
   final List<AIMessage> _messages = [
     AIMessage(
       isMine: false,
-      text: '我可以生成建议并执行写回：任务拆分、风险同步、日报汇总。',
+      text: '我可以生成建议并执行写回: 任务拆分、风险同步、日报汇总。',
       time: DateTime(2026, 4, 9, 9, 30),
     ),
   ];
