@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ottersync/pages/Main/index.dart';
+import 'package:ottersync/state/app_state.dart';
 
 final ThemeData _appTheme = ThemeData(
   useMaterial3: true,
@@ -28,10 +29,15 @@ final ThemeData _appTheme = ThemeData(
   ),
 );
 
+final AppState _appState = AppState();
+
 Widget getRootWidget() {
-  return MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: _appTheme,
-    home: const MainPage(),
+  return AppStateScope(
+    notifier: _appState,
+    child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: _appTheme,
+      home: const MainPage(),
+    ),
   );
 }

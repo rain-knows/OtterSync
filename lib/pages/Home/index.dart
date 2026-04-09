@@ -1,51 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:ottersync/state/app_state.dart';
 
-class HomeView extends StatelessWidget {
+enum _TaskFilter { all, pending, completed }
+
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  _TaskFilter _filter = _TaskFilter.pending;
+
+  @override
   Widget build(BuildContext context) {
+    final appState = AppStateScope.of(context);
+
+    final tasks = switch (_filter) {
+      _TaskFilter.all => appState.tasks,
+      _TaskFilter.pending => appState.tasks.where((task) => !task.done).toList(),
+      _TaskFilter.completed =>
+        appState.tasks.where((task) => task.done).toList(),
+    };
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      children: const [
-        _HeroCard(),
-        SizedBox(height: 20),
-        _SectionTitle(title: '进行中的项目'),
-        SizedBox(height: 12),
-        _ProjectCard(
-          title: 'OtterSync 移动端适配',
-          progress: 0.72,
-          meta: 'Sprint 2 · 12 / 16 任务完成',
-          accent: Color(0xFF0E5E6F),
+      children: [
+        _HeroCard(appState: appState),
+        const SizedBox(height: 20),
+        const _SectionTitle(title: '进行中的项目'),
+        const SizedBox(height: 12),
+        ...appState.projectProgressList
+            .map(
+              (project) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _ProjectCard(
+                  title: project.title,
+                  progress: project.progress,
+                  meta: project.meta,
+                  accent: project.accent,
+                ),
+              ),
+            )
+            .toList(),
+        const SizedBox(height: 8),
+        const _SectionTitle(title: '我的待办'),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            FilterChip(
+              label: const Text('全部'),
+              selected: _filter == _TaskFilter.all,
+              onSelected: (_) => setState(() => _filter = _TaskFilter.all),
+            ),
+            FilterChip(
+              label: const Text('待处理'),
+              selected: _filter == _TaskFilter.pending,
+              onSelected: (_) => setState(() => _filter = _TaskFilter.pending),
+            ),
+            FilterChip(
+              label: const Text('已完成'),
+              selected: _filter == _TaskFilter.completed,
+              onSelected: (_) => setState(() => _filter = _TaskFilter.completed),
+            ),
+          ],
         ),
-        SizedBox(height: 12),
-        _ProjectCard(
-          title: 'AI 辅助任务流原型',
-          progress: 0.43,
-          meta: '待完善提示词与操作编排',
-          accent: Color(0xFF4D7C8A),
-        ),
-        SizedBox(height: 20),
-        _SectionTitle(title: '我的待办'),
-        SizedBox(height: 12),
-        _TaskCard(
-          title: '搭建底部导航与主页面框架',
-          tag: '高优先级',
-          detail: '今天截止 · 需要完成安卓手机首页框架',
-        ),
-        SizedBox(height: 12),
-        _TaskCard(
-          title: '补充 Dashboard 关键指标卡片',
-          tag: '计划中',
-          detail: '接入燃尽图、工时与完成率占位组件',
-        ),
+        const SizedBox(height: 12),
+        if (tasks.isEmpty)
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(18),
+              child: Text('当前筛选下暂无任务。'),
+            ),
+          )
+        else
+          ...tasks
+              .map(
+                (task) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _TaskCard(
+                    task: task,
+                    onToggle: () => appState.toggleTask(task.id),
+                  ),
+                ),
+              )
+              .toList(),
       ],
     );
   }
 }
 
 class _HeroCard extends StatelessWidget {
-  const _HeroCard();
+  const _HeroCard({required this.appState});
+
+  final AppState appState;
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +134,16 @@ class _HeroCard extends StatelessWidget {
           Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: const [
-              _MetricChip(label: '活跃项目', value: '06'),
-              _MetricChip(label: '待处理任务', value: '18'),
-              _MetricChip(label: '本周工时', value: '29h'),
+            children: [
+              _MetricChip(
+                label: '活跃项目',
+                value: appState.activeProjectCount.toString().padLeft(2, '0'),
+              ),
+              _MetricChip(
+                label: '待处理任务',
+                value: appState.pendingTaskCount.toString().padLeft(2, '0'),
+              ),
+              _MetricChip(label: '本周工时', value: '${appState.estimatedWeekHours}h'),
             ],
           ),
         ],
@@ -163,10 +220,7 @@ class _ProjectCard extends StatelessWidget {
                 Container(
                   width: 12,
                   height: 12,
-                  decoration: BoxDecoration(
-                    color: accent,
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -205,15 +259,22 @@ class _ProjectCard extends StatelessWidget {
 }
 
 class _TaskCard extends StatelessWidget {
-  const _TaskCard({
-    required this.title,
-    required this.tag,
-    required this.detail,
-  });
+  const _TaskCard({required this.task, required this.onToggle});
 
-  final String title;
-  final String tag;
-  final String detail;
+  final TaskItem task;
+  final VoidCallback onToggle;
+
+  Color get _priorityColor => switch (task.priority) {
+    TaskPriority.high => const Color(0xFFE86B6B),
+    TaskPriority.medium => const Color(0xFF4D7C8A),
+    TaskPriority.low => const Color(0xFF6B7B83),
+  };
+
+  String get _priorityLabel => switch (task.priority) {
+    TaskPriority.high => '高优先级',
+    TaskPriority.medium => '中优先级',
+    TaskPriority.low => '低优先级',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -225,51 +286,67 @@ class _TaskCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: const Color(0xFFD7EEF2),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(
-                Icons.task_alt_rounded,
-                color: Color(0xFF0E5E6F),
-              ),
-            ),
-            const SizedBox(width: 14),
+            Checkbox(value: task.done, onChanged: (_) => onToggle()),
+            const SizedBox(width: 6),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    task.title,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
+                      decoration: task.done
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F6),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      tag,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF4B5A61),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _priorityColor.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          _priorityLabel,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _priorityColor,
+                          ),
+                        ),
                       ),
-                    ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F6),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          task.dueText,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF4B5A61),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Text(
-                    detail,
+                    task.project,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: const Color(0xFF6B7B83),
                     ),
