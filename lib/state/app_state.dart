@@ -287,11 +287,12 @@ class AppState extends ChangeNotifier {
   ];
   final List<WorkspaceActivity> _activities = [..._seedActivities];
 
-  final List<WorkspaceAudit> _audits = const [
+  static const List<WorkspaceAudit> _seedAudits = [
     WorkspaceAudit(action: '角色策略更新', operator: '张怡博', scope: '全局权限', time: '今天 09:30'),
     WorkspaceAudit(action: 'AI 建议执行', operator: '王行健', scope: 'AI 辅助任务流原型', time: '今天 10:10'),
     WorkspaceAudit(action: '风险任务复核', operator: '林雯', scope: 'OtterSync 移动端适配', time: '昨天 17:45'),
   ];
+  final List<WorkspaceAudit> _audits = [..._seedAudits];
 
   final List<String> promptTemplates = const [
     '生成测试步骤',
