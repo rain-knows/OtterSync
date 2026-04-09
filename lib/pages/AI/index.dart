@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ottersync/state/app_state.dart';
+import 'package:ottersync/theme/design_tokens.dart';
 
 class AIView extends StatefulWidget {
   const AIView({super.key});
@@ -18,8 +19,7 @@ class _AIViewState extends State<AIView> {
   }
 
   void _send(AppState appState) {
-    final text = _controller.text;
-    appState.sendAiMessage(text);
+    appState.sendAiMessage(_controller.text);
     _controller.clear();
     setState(() {});
   }
@@ -32,7 +32,7 @@ class _AIViewState extends State<AIView> {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            padding: AppSpace.pagePadding,
             children: [
               const _AIHero(),
               const SizedBox(height: 20),
@@ -44,21 +44,43 @@ class _AIViewState extends State<AIView> {
                       (item) => ActionChip(
                         label: Text(item),
                         onPressed: () => appState.sendPrompt(item),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       ),
                     )
                     .toList(),
               ),
               const SizedBox(height: 20),
-              ...appState.aiMessages
-                  .map(
-                    (message) => _Bubble(isMe: message.isMine, text: message.text),
-                  )
-                  .toList(),
+              const Text('执行建议', style: TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 10),
+              if (appState.suggestions.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(14),
+                    child: Text('暂无建议，可输入“拆分/风险/日报”触发。'),
+                  ),
+                )
+              else
+                ...appState.suggestions
+                    .map(
+                      (item) => Card(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        child: ListTile(
+                          title: Text(item.title),
+                          subtitle: Text(item.description),
+                          trailing: item.executed
+                              ? const Text('已执行', style: TextStyle(color: AppColors.success))
+                              : FilledButton.tonal(
+                                  onPressed: () => appState.executeSuggestion(item.id),
+                                  child: const Text('确认执行'),
+                                ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              const SizedBox(height: 10),
+              ...appState.aiMessages
+                  .map((message) => _Bubble(isMe: message.isMine, text: message.text))
+                  .toList(),
             ],
           ),
         ),
@@ -84,9 +106,7 @@ class _AIHero extends StatelessWidget {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF16343D), Color(0xFF315C67)],
-        ),
+        gradient: const LinearGradient(colors: [Color(0xFF16343D), Color(0xFF315C67)]),
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,18 +116,14 @@ class _AIHero extends StatelessWidget {
               Icon(Icons.auto_awesome_rounded, color: Colors.white),
               SizedBox(width: 10),
               Text(
-                'AI 智能辅助',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                ),
+                'AI 执行助手',
+                style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800),
               ),
             ],
           ),
           SizedBox(height: 12),
           Text(
-            '支持自然语言问答、测试用例建议、风险总结与日报草稿生成。',
+            '支持建议-确认-执行-回写闭环：任务拆分、风险同步、日报汇总。',
             style: TextStyle(color: Color(0xFFD8E9ED), height: 1.5),
           ),
         ],
@@ -125,8 +141,8 @@ class _Bubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final alignment = isMe ? Alignment.centerRight : Alignment.centerLeft;
-    final color = isMe ? const Color(0xFF0E5E6F) : Colors.white;
-    final textColor = isMe ? Colors.white : const Color(0xFF132026);
+    final color = isMe ? AppColors.brand : Colors.white;
+    final textColor = isMe ? Colors.white : AppColors.title;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -137,10 +153,7 @@ class _Bubble extends StatelessWidget {
           curve: Curves.easeOutCubic,
           constraints: const BoxConstraints(maxWidth: 290),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(22),
-          ),
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(22)),
           child: Text(text, style: TextStyle(color: textColor, height: 1.5)),
         ),
       ),
@@ -162,13 +175,9 @@ class _InputBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final canSend = controller.text.trim().isNotEmpty;
-
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
       child: Row(
         children: [
           const SizedBox(width: 8),
@@ -177,7 +186,7 @@ class _InputBar extends StatelessWidget {
               controller: controller,
               decoration: const InputDecoration(
                 border: InputBorder.none,
-                hintText: '输入你的问题或操作指令...',
+                hintText: '输入指令，例如：拆分高优任务 / 同步风险 / 生成日报',
               ),
               onChanged: onChanged,
               onSubmitted: (_) {
@@ -187,10 +196,7 @@ class _InputBar extends StatelessWidget {
               },
             ),
           ),
-          FilledButton(
-            onPressed: canSend ? onSend : null,
-            child: const Text('发送'),
-          ),
+          FilledButton(onPressed: canSend ? onSend : null, child: const Text('发送')),
         ],
       ),
     );
