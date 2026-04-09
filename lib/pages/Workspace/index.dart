@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ottersync/state/app_state.dart';
+import 'package:ottersync/theme/design_tokens.dart';
 
 class WorkspaceView extends StatelessWidget {
   const WorkspaceView({super.key});
@@ -10,7 +11,7 @@ class WorkspaceView extends StatelessWidget {
     final onlineCount = appState.members.where((member) => member.online).length;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+      padding: AppSpace.pagePadding,
       children: [
         _WorkspaceHeader(
           memberCount: appState.members.length,
@@ -18,21 +19,38 @@ class WorkspaceView extends StatelessWidget {
           activeProjects: appState.activeProjectCount,
         ),
         const SizedBox(height: 20),
-        const _SectionTitle(title: '组织与权限'),
+        const _SectionTitle(title: '权限矩阵'),
         const SizedBox(height: 12),
-        _InfoCard(
-          icon: Icons.apartment_rounded,
-          title: '当前工作区',
-          content:
-              '第 2 小组协作空间 · 活跃项目 ${appState.activeProjectCount} 个，成员 ${appState.members.length} 人。',
-        ),
+        ...appState.rolePermissionMatrix
+            .map(
+              (item) => Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ListTile(
+                  title: Text(item.role),
+                  subtitle: Text(item.permissions.join(' · ')),
+                ),
+              ),
+            )
+            .toList(),
+        const SizedBox(height: 8),
+        const _SectionTitle(title: '项目级授权策略'),
         const SizedBox(height: 12),
-        const _InfoCard(
-          icon: Icons.lock_person_rounded,
-          title: '权限治理',
-          content: '支持管理员、成员、访客三级访问控制，可按项目细粒度授权。',
-        ),
-        const SizedBox(height: 20),
+        ...appState.projectPolicies
+            .map(
+              (policy) => Card(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppColors.brandSoft,
+                    child: Icon(Icons.shield_rounded, color: AppColors.brand),
+                  ),
+                  title: Text(policy.projectName),
+                  subtitle: Text(policy.policy),
+                ),
+              ),
+            )
+            .toList(),
+        const SizedBox(height: 8),
         const _SectionTitle(title: '成员状态'),
         const SizedBox(height: 12),
         ...appState.members
@@ -41,35 +59,24 @@ class WorkspaceView extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 10),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: member.online
-                        ? const Color(0xFFD7EEF2)
-                        : const Color(0xFFE8EEF0),
+                    backgroundColor: member.online ? AppColors.brandSoft : const Color(0xFFE8EEF0),
                     child: Icon(
                       Icons.person_rounded,
-                      color: member.online
-                          ? const Color(0xFF0E5E6F)
-                          : const Color(0xFF8A99A0),
+                      color: member.online ? AppColors.brand : const Color(0xFF8A99A0),
                     ),
                   ),
                   title: Text(member.name),
                   subtitle: Text(member.role),
                   trailing: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: member.online
-                          ? const Color(0xFFDFF4E6)
-                          : const Color(0xFFF0F3F4),
+                      color: member.online ? const Color(0xFFDFF4E6) : const Color(0xFFF0F3F4),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
                       member.online ? '在线' : '离线',
                       style: TextStyle(
-                        color: member.online
-                            ? const Color(0xFF2E7D32)
-                            : const Color(0xFF6B7B83),
+                        color: member.online ? AppColors.success : AppColors.subtitle,
                         fontWeight: FontWeight.w600,
                         fontSize: 12,
                       ),
@@ -79,7 +86,23 @@ class WorkspaceView extends StatelessWidget {
               ),
             )
             .toList(),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
+        const _SectionTitle(title: '操作审计'),
+        const SizedBox(height: 12),
+        ...appState.audits
+            .take(6)
+            .map(
+              (item) => Card(
+                margin: const EdgeInsets.only(bottom: 10),
+                child: ListTile(
+                  title: Text(item.action),
+                  subtitle: Text('${item.operator} · ${item.scope}'),
+                  trailing: Text(item.time, style: const TextStyle(color: AppColors.subtitle, fontSize: 12)),
+                ),
+              ),
+            )
+            .toList(),
+        const SizedBox(height: 8),
         const _SectionTitle(title: '最近动态'),
         const SizedBox(height: 12),
         if (appState.activities.isEmpty)
@@ -91,9 +114,7 @@ class WorkspaceView extends StatelessWidget {
           )
         else
           ...appState.activities
-              .map(
-                (item) => _ActivityTile(title: item.title, time: item.time),
-              )
+              .map((item) => _ActivityTile(title: item.title, time: item.time))
               .toList(),
       ],
     );
@@ -123,16 +144,12 @@ class _WorkspaceHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '工作区与群组',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF132026),
-            ),
+            'Workspace 治理中心',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: AppColors.title),
           ),
           const SizedBox(height: 10),
           const Text(
-            '聚合成员、角色、权限与协作动态，为后续邀请、审批和共享流程提供基础。',
+            '聚合角色权限、授权策略、审计记录和动态事件，保证协作模块可管理可追溯。',
             style: TextStyle(height: 1.5, color: Color(0xFF51626A)),
           ),
           const SizedBox(height: 14),
@@ -160,66 +177,8 @@ class _Tag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
-    );
-  }
-}
-
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.icon,
-    required this.title,
-    required this.content,
-  });
-
-  final IconData icon;
-  final String title;
-  final String content;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0xFFD7EEF2),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(icon, color: const Color(0xFF0E5E6F)),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    content,
-                    style: const TextStyle(
-                      color: Color(0xFF6B7B83),
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -235,8 +194,8 @@ class _ActivityTile extends StatelessWidget {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 6),
       leading: const CircleAvatar(
-        backgroundColor: Color(0xFFD7EEF2),
-        child: Icon(Icons.bolt_rounded, color: Color(0xFF0E5E6F)),
+        backgroundColor: AppColors.brandSoft,
+        child: Icon(Icons.bolt_rounded, color: AppColors.brand),
       ),
       title: Text(title),
       subtitle: Text(time),
@@ -255,7 +214,7 @@ class _SectionTitle extends StatelessWidget {
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
         fontWeight: FontWeight.w800,
-        color: const Color(0xFF132026),
+        color: AppColors.title,
       ),
     );
   }
