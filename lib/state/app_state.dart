@@ -33,10 +33,7 @@ class ProjectRecord {
 }
 
 class TaskHistoryEntry {
-  const TaskHistoryEntry({
-    required this.message,
-    required this.time,
-  });
+  const TaskHistoryEntry({required this.message, required this.time});
 
   final String message;
   final DateTime time;
@@ -121,27 +118,25 @@ class WorkspaceAudit {
 }
 
 class RolePermission {
-  const RolePermission({
-    required this.role,
-    required this.permissions,
-  });
+  const RolePermission({required this.role, required this.permissions});
 
   final String role;
   final List<String> permissions;
 }
 
 class ProjectPolicy {
-  const ProjectPolicy({
-    required this.projectName,
-    required this.policy,
-  });
+  const ProjectPolicy({required this.projectName, required this.policy});
 
   final String projectName;
   final String policy;
 }
 
 class AIMessage {
-  const AIMessage({required this.isMine, required this.text, required this.time});
+  const AIMessage({
+    required this.isMine,
+    required this.text,
+    required this.time,
+  });
 
   final bool isMine;
   final String text;
@@ -200,9 +195,19 @@ class AppState extends ChangeNotifier {
   ];
 
   final List<ProjectRecord> _projects = const [
-    ProjectRecord(id: 'p-mobile', name: 'OtterSync 移动端适配', ownerId: 'm-1', phase: '交付中'),
+    ProjectRecord(
+      id: 'p-mobile',
+      name: 'OtterSync 移动端适配',
+      ownerId: 'm-1',
+      phase: '交付中',
+    ),
     ProjectRecord(id: 'p-ai', name: 'AI 辅助任务流原型', ownerId: 'm-2', phase: '验证中'),
-    ProjectRecord(id: 'p-workspace', name: '协作空间治理', ownerId: 'm-4', phase: '设计完善'),
+    ProjectRecord(
+      id: 'p-workspace',
+      name: '协作空间治理',
+      ownerId: 'm-4',
+      phase: '设计完善',
+    ),
   ];
 
   final List<TaskItem> _tasks = [
@@ -214,7 +219,9 @@ class AppState extends ChangeNotifier {
       priority: TaskPriority.high,
       dueText: '今天截止',
       status: TaskStatus.done,
-      history: [TaskHistoryEntry(message: '初始化完成', time: DateTime(2026, 4, 8, 10, 10))],
+      history: [
+        TaskHistoryEntry(message: '初始化完成', time: DateTime(2026, 4, 8, 10, 10)),
+      ],
     ),
     TaskItem(
       id: 't-2',
@@ -224,7 +231,9 @@ class AppState extends ChangeNotifier {
       priority: TaskPriority.medium,
       dueText: '明天下午',
       status: TaskStatus.inProgress,
-      history: [TaskHistoryEntry(message: '进入开发阶段', time: DateTime(2026, 4, 8, 15, 20))],
+      history: [
+        TaskHistoryEntry(message: '进入开发阶段', time: DateTime(2026, 4, 8, 15, 20)),
+      ],
     ),
     TaskItem(
       id: 't-3',
@@ -236,7 +245,9 @@ class AppState extends ChangeNotifier {
       status: TaskStatus.review,
       isRisk: true,
       dependencyIds: ['t-2'],
-      history: [TaskHistoryEntry(message: '提测后待评审', time: DateTime(2026, 4, 8, 19, 10))],
+      history: [
+        TaskHistoryEntry(message: '提测后待评审', time: DateTime(2026, 4, 8, 19, 10)),
+      ],
     ),
     TaskItem(
       id: 't-4',
@@ -246,7 +257,12 @@ class AppState extends ChangeNotifier {
       priority: TaskPriority.medium,
       dueText: '周五前',
       status: TaskStatus.done,
-      history: [TaskHistoryEntry(message: '权限模型草案完成', time: DateTime(2026, 4, 7, 16, 40))],
+      history: [
+        TaskHistoryEntry(
+          message: '权限模型草案完成',
+          time: DateTime(2026, 4, 7, 16, 40),
+        ),
+      ],
     ),
     TaskItem(
       id: 't-5',
@@ -257,7 +273,9 @@ class AppState extends ChangeNotifier {
       dueText: '下周一',
       status: TaskStatus.backlog,
       dependencyIds: ['t-4'],
-      history: [TaskHistoryEntry(message: '需求待排期', time: DateTime(2026, 4, 8, 9, 30))],
+      history: [
+        TaskHistoryEntry(message: '需求待排期', time: DateTime(2026, 4, 8, 9, 30)),
+      ],
     ),
   ];
 
@@ -275,7 +293,10 @@ class AppState extends ChangeNotifier {
   ];
 
   final List<ProjectPolicy> projectPolicies = const [
-    ProjectPolicy(projectName: 'OtterSync 移动端适配', policy: '仅管理员可发布里程碑；成员可变更任务状态'),
+    ProjectPolicy(
+      projectName: 'OtterSync 移动端适配',
+      policy: '仅管理员可发布里程碑；成员可变更任务状态',
+    ),
     ProjectPolicy(projectName: 'AI 辅助任务流原型', policy: 'AI 建议执行需二次确认并记录审计'),
     ProjectPolicy(projectName: '协作空间治理', policy: '权限策略更新需管理员与产品双确认'),
   ];
@@ -288,9 +309,24 @@ class AppState extends ChangeNotifier {
   final List<WorkspaceActivity> _activities = [..._seedActivities];
 
   static const List<WorkspaceAudit> _seedAudits = [
-    WorkspaceAudit(action: '角色策略更新', operator: '张怡博', scope: '全局权限', time: '今天 09:30'),
-    WorkspaceAudit(action: 'AI 建议执行', operator: '王行健', scope: 'AI 辅助任务流原型', time: '今天 10:10'),
-    WorkspaceAudit(action: '风险任务复核', operator: '林雯', scope: 'OtterSync 移动端适配', time: '昨天 17:45'),
+    WorkspaceAudit(
+      action: '角色策略更新',
+      operator: '张怡博',
+      scope: '全局权限',
+      time: '今天 09:30',
+    ),
+    WorkspaceAudit(
+      action: 'AI 建议执行',
+      operator: '王行健',
+      scope: 'AI 辅助任务流原型',
+      time: '今天 10:10',
+    ),
+    WorkspaceAudit(
+      action: '风险任务复核',
+      operator: '林雯',
+      scope: 'OtterSync 移动端适配',
+      time: '昨天 17:45',
+    ),
   ];
   final List<WorkspaceAudit> _audits = List.from(_seedAudits);
 
@@ -328,16 +364,23 @@ class AppState extends ChangeNotifier {
   List<WorkspaceAudit> get audits => List.unmodifiable(_audits);
   List<AiSuggestion> get suggestions => List.unmodifiable(_suggestions);
 
-  int get activeProjectCount => _tasks.map((task) => task.projectId).toSet().length;
-  int get pendingTaskCount => _tasks.where((task) => task.status != TaskStatus.done).length;
-  int get completedTaskCount => _tasks.where((task) => task.status == TaskStatus.done).length;
+  int get activeProjectCount =>
+      _tasks.map((task) => task.projectId).toSet().length;
+  int get pendingTaskCount =>
+      _tasks.where((task) => task.status != TaskStatus.done).length;
+  int get completedTaskCount =>
+      _tasks.where((task) => task.status == TaskStatus.done).length;
   int get estimatedWeekHours => completedTaskCount * 6 + pendingTaskCount * 4;
 
   int get riskTaskCount => _tasks
-      .where((task) => !task.done && (task.priority == TaskPriority.high || task.isRisk))
+      .where(
+        (task) =>
+            !task.done && (task.priority == TaskPriority.high || task.isRisk),
+      )
       .length;
 
-  int get executedSuggestionCount => _suggestions.where((item) => item.executed).length;
+  int get executedSuggestionCount =>
+      _suggestions.where((item) => item.executed).length;
 
   double get completionRate {
     if (_tasks.isEmpty) {
@@ -376,7 +419,9 @@ class AppState extends ChangeNotifier {
       return [];
     }
     return members.map((member) {
-      final load = _tasks.where((task) => task.assigneeId == member.id && !task.done).length;
+      final load = _tasks
+          .where((task) => task.assigneeId == member.id && !task.done)
+          .length;
       return (load / 4).clamp(0.0, 1.0);
     }).toList();
   }
@@ -497,10 +542,21 @@ class AppState extends ChangeNotifier {
       return;
     }
     task.status = status;
-    task.history.insert(0, TaskHistoryEntry(message: '状态更新为 ${statusLabel(status)}', time: DateTime.now()));
-    task.isRisk = status != TaskStatus.done && task.priority == TaskPriority.high;
+    task.history.insert(
+      0,
+      TaskHistoryEntry(
+        message: '状态更新为 ${statusLabel(status)}',
+        time: DateTime.now(),
+      ),
+    );
+    task.isRisk =
+        status != TaskStatus.done && task.priority == TaskPriority.high;
     _addActivity('任务「${task.title}」更新为 ${statusLabel(status)}');
-    _addAudit('任务状态流转', memberNameById(task.assigneeId), projectNameById(task.projectId));
+    _addAudit(
+      '任务状态流转',
+      memberNameById(task.assigneeId),
+      projectNameById(task.projectId),
+    );
     notifyListeners();
   }
 
@@ -510,9 +566,19 @@ class AppState extends ChangeNotifier {
       return;
     }
     task.assigneeId = memberId;
-    task.history.insert(0, TaskHistoryEntry(message: '负责人调整为 ${memberNameById(memberId)}', time: DateTime.now()));
+    task.history.insert(
+      0,
+      TaskHistoryEntry(
+        message: '负责人调整为 ${memberNameById(memberId)}',
+        time: DateTime.now(),
+      ),
+    );
     _addActivity('任务「${task.title}」重新分配给 ${memberNameById(memberId)}');
-    _addAudit('任务分配', memberNameById(memberId), projectNameById(task.projectId));
+    _addAudit(
+      '任务分配',
+      memberNameById(memberId),
+      projectNameById(task.projectId),
+    );
     notifyListeners();
   }
 
@@ -521,11 +587,7 @@ class AppState extends ChangeNotifier {
     if (parent == null) {
       return;
     }
-    final children = [
-      '梳理业务流转节点',
-      '完善状态校验逻辑',
-      '补齐异常态与验收项',
-    ];
+    final children = ['梳理业务流转节点', '完善状态校验逻辑', '补齐异常态与验收项'];
     for (final title in children) {
       createTask(
         title: '${parent.title} - $title',
@@ -559,7 +621,9 @@ class AppState extends ChangeNotifier {
       _suggestions.insert(0, suggestion);
     }
 
-    final shortText = content.length > _maxActivityPreviewLength ? '${content.substring(0, _maxActivityPreviewLength)}...' : content;
+    final shortText = content.length > _maxActivityPreviewLength
+        ? '${content.substring(0, _maxActivityPreviewLength)}...'
+        : content;
     _addActivity('$_aiActivityPrefix$shortText');
     notifyListeners();
   }
@@ -575,14 +639,18 @@ class AppState extends ChangeNotifier {
     }
     switch (suggestion.type) {
       case AiSuggestionType.splitTask:
-        final target = _tasks.where((task) => task.priority == TaskPriority.high && !task.done).firstOrNull;
+        final target = _tasks
+            .where((task) => task.priority == TaskPriority.high && !task.done)
+            .firstOrNull;
         if (target != null) {
           splitTask(target.id);
         }
       case AiSuggestionType.syncRiskSummary:
         _addActivity('AI 已同步风险摘要：高优风险任务 $riskTaskCount 项');
       case AiSuggestionType.createDailyReport:
-        _addActivity('AI 已回写日报：完成 $completedTaskCount 项，待办 $pendingTaskCount 项');
+        _addActivity(
+          'AI 已回写日报：完成 $completedTaskCount 项，待办 $pendingTaskCount 项',
+        );
     }
     _suggestions[index] = suggestion.copyWith(executed: true);
     _addAudit('AI 建议执行', 'AI Assistant', '智能执行队列');
@@ -686,7 +754,11 @@ class AppState extends ChangeNotifier {
 }
 
 class AppStateScope extends InheritedNotifier<AppState> {
-  const AppStateScope({super.key, required super.notifier, required super.child});
+  const AppStateScope({
+    super.key,
+    required super.notifier,
+    required super.child,
+  });
 
   static AppState of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<AppStateScope>();

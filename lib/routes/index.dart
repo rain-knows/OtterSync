@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ottersync/pages/Main/index.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
@@ -19,7 +20,9 @@ final ThemeData _appTheme = ThemeData(
   cardTheme: CardThemeData(
     color: Colors.white,
     elevation: 0,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpace.cardRadius)),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppSpace.cardRadius),
+    ),
   ),
   navigationBarTheme: NavigationBarThemeData(
     height: 72,
@@ -31,14 +34,24 @@ final ThemeData _appTheme = ThemeData(
 );
 
 final AppState _appState = AppState();
+final GoRouter _rootRouter = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      name: 'home',
+      builder: (context, state) => const MainPage(),
+    ),
+  ],
+);
 
 Widget getRootWidget() {
   return AppStateScope(
     notifier: _appState,
-    child: MaterialApp(
+    child: MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: _appTheme,
-      home: const MainPage(),
+      routerConfig: _rootRouter,
     ),
   );
 }
