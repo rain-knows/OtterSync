@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ottersync/components/Common/section_title.dart';
-import 'package:ottersync/components/Home/home_hero_card.dart';
-import 'package:ottersync/components/Home/home_layer_card.dart';
-import 'package:ottersync/components/Home/home_project_card.dart';
-import 'package:ottersync/components/Home/home_quick_add_card.dart';
-import 'package:ottersync/components/Home/home_task_card.dart';
+import 'package:ottersync/components/Common/SectionHeader.dart';
+import 'package:ottersync/components/Home/HomeHeroSection.dart';
+import 'package:ottersync/components/Home/LayerProgressCard.dart';
+import 'package:ottersync/components/Home/ProjectOverviewCard.dart';
+import 'package:ottersync/components/Home/QuickCreateBar.dart';
+import 'package:ottersync/components/Home/TaskOverviewCard.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
@@ -44,23 +44,23 @@ class _HomeViewState extends State<HomeView> {
     return ListView(
       padding: AppSpace.pagePadding,
       children: [
-        HomeHeroCard(appState: appState),
+        HomeHeroSection(appState: appState),
         const SizedBox(height: 20),
-        const SectionTitle(title: '完成度分层验收'),
+        const SectionHeader(title: '完成度分层验收'),
         const SizedBox(height: 12),
         ...appState.completionLayers.map(
           (layer) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: HomeLayerCard(layer: layer),
+            child: LayerProgressCard(layer: layer),
           ),
         ),
         const SizedBox(height: 8),
-        const SectionTitle(title: '项目推进'),
+        const SectionHeader(title: '项目推进'),
         const SizedBox(height: 12),
         ...appState.projectProgressList.map(
           (project) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: HomeProjectCard(
+            child: ProjectOverviewCard(
               title: project.title,
               progress: project.progress,
               meta: project.meta,
@@ -69,9 +69,9 @@ class _HomeViewState extends State<HomeView> {
           ),
         ),
         const SizedBox(height: 8),
-        const SectionTitle(title: '任务流程闭环'),
+        const SectionHeader(title: '任务流程闭环'),
         const SizedBox(height: 12),
-        HomeQuickAddCard(
+        QuickCreateBar(
           controller: _quickAddController,
           canSubmit: _canQuickAdd,
           onChanged: (value) =>
@@ -124,7 +124,7 @@ class _HomeViewState extends State<HomeView> {
           ...tasks.map(
             (task) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: HomeTaskCard(task: task),
+              child: TaskOverviewCard(task: task),
             ),
           ),
       ],

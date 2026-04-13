@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ottersync/theme/design_tokens.dart';
 
-class AIInputBar extends StatelessWidget {
-  const AIInputBar({
+class ChatInputBar extends StatelessWidget {
+  const ChatInputBar({
     super.key,
     required this.controller,
     required this.onChanged,
@@ -15,11 +16,13 @@ class AIInputBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final canSend = controller.text.trim().isNotEmpty;
+    final palette = AppThemePalette.of(context);
 
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.panel.withValues(alpha: 0.96),
+        border: Border.all(color: palette.border),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -30,6 +33,7 @@ class AIInputBar extends StatelessWidget {
               controller: controller,
               decoration: const InputDecoration(
                 border: InputBorder.none,
+                filled: false,
                 hintText: '输入指令，例如：拆分高优任务 / 同步风险 / 生成日报',
               ),
               onChanged: onChanged,

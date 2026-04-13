@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ottersync/theme/design_tokens.dart';
 
-class HomeProjectCard extends StatelessWidget {
-  const HomeProjectCard({
+class ProjectOverviewCard extends StatelessWidget {
+  const ProjectOverviewCard({
     super.key,
     required this.title,
     required this.progress,
@@ -17,6 +18,8 @@ class HomeProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final palette = AppThemePalette.of(context);
+    final indicatorColor = palette.brandAccent;
 
     return Card(
       child: Padding(
@@ -30,8 +33,15 @@ class HomeProjectCard extends StatelessWidget {
                   width: 12,
                   height: 12,
                   decoration: BoxDecoration(
-                    color: accent,
+                    color: indicatorColor,
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: indicatorColor.withValues(alpha: 0.28),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -52,15 +62,15 @@ class HomeProjectCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 minHeight: 9,
                 value: progress,
-                backgroundColor: const Color(0xFFE3ECEE),
-                valueColor: AlwaysStoppedAnimation<Color>(accent),
+                backgroundColor: palette.surfaceSecondary,
+                valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
               ),
             ),
             const SizedBox(height: 10),
             Text(
               meta,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: const Color(0xFF6B7B83),
+                color: palette.subtitle,
               ),
             ),
           ],

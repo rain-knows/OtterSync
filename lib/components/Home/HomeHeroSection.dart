@@ -2,22 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class HomeHeroCard extends StatelessWidget {
-  const HomeHeroCard({super.key, required this.appState});
+class HomeHeroSection extends StatelessWidget {
+  const HomeHeroSection({super.key, required this.appState});
 
   final AppState appState;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final palette = AppThemePalette.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        gradient: const LinearGradient(
-          colors: [AppColors.brand, Color(0xFF3C8D9E)],
+        border: Border.all(color: palette.borderStrong),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [Color(0xFF171924), Color(0xFF10111A), Color(0xFF212752)]
+              : const [Color(0xFFF2F4FF), Color(0xFFFFFFFF), Color(0xFFE9EEFF)],
         ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x44000000),
+            blurRadius: 32,
+            offset: Offset(0, 16),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,15 +39,15 @@ class HomeHeroCard extends StatelessWidget {
           Text(
             'OtterSync 完成度分层',
             style: theme.textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
+              color: palette.title,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 10),
           Text(
             '覆盖产品、业务、工程三层验收基线，保证复杂功能可交付、可协作、可追踪。',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.86),
+              color: palette.text,
               height: 1.5,
             ),
           ),
@@ -73,11 +87,17 @@ class _MetricChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       width: 92,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.14)
+            : palette.brandSoft,
+        border: Border.all(color: palette.borderStrong),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -85,20 +105,14 @@ class _MetricChip extends StatelessWidget {
         children: [
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: palette.title,
               fontWeight: FontWeight.w800,
               fontSize: 18,
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 12,
-            ),
-          ),
+          Text(label, style: TextStyle(color: palette.text, fontSize: 12)),
         ],
       ),
     );

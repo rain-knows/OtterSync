@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ottersync/components/Common/section_title.dart';
-import 'package:ottersync/components/Dashboard/dashboard_chart_card.dart';
-import 'package:ottersync/components/Dashboard/dashboard_metric_grid.dart';
-import 'package:ottersync/components/Dashboard/dashboard_risk_and_load_card.dart';
-import 'package:ottersync/components/Dashboard/dashboard_status_distribution_card.dart';
-import 'package:ottersync/components/Dashboard/dashboard_summary_card.dart';
+import 'package:ottersync/components/Common/SectionHeader.dart';
+import 'package:ottersync/components/Dashboard/DashboardMetricCards.dart';
+import 'package:ottersync/components/Dashboard/RiskLoadPanel.dart';
+import 'package:ottersync/components/Dashboard/StatusBreakdownCard.dart';
+import 'package:ottersync/components/Dashboard/SummaryPanel.dart';
+import 'package:ottersync/components/Dashboard/TrendChartCard.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
@@ -17,25 +17,25 @@ class DashboardView extends StatelessWidget {
     return ListView(
       padding: AppSpace.pagePadding,
       children: [
-        const SectionTitle(title: '项目 Dashboard'),
+        const SectionHeader(title: '项目 Dashboard'),
         const SizedBox(height: 12),
-        DashboardMetricGrid(appState: appState),
+        DashboardMetricCards(appState: appState),
         const SizedBox(height: 20),
-        const SectionTitle(title: '交付趋势'),
+        const SectionHeader(title: '交付趋势'),
         const SizedBox(height: 12),
-        DashboardChartCard(bars: appState.weeklyCompletionTrend),
+        TrendChartCard(bars: appState.weeklyCompletionTrend),
         const SizedBox(height: 20),
-        const SectionTitle(title: '流程状态分布'),
+        const SectionHeader(title: '流程状态分布'),
         const SizedBox(height: 12),
-        DashboardStatusDistributionCard(appState: appState),
+        StatusBreakdownCard(appState: appState),
         const SizedBox(height: 20),
-        const SectionTitle(title: '风险分布与成员负载'),
+        const SectionHeader(title: '风险分布与成员负载'),
         const SizedBox(height: 12),
-        DashboardRiskAndLoadCard(appState: appState),
+        RiskLoadPanel(appState: appState),
         const SizedBox(height: 20),
-        const SectionTitle(title: '分析摘要'),
+        const SectionHeader(title: '分析摘要'),
         const SizedBox(height: 12),
-        DashboardSummaryCard(
+        SummaryPanel(
           summaryText: appState.summaryText,
           suggestionText: appState.suggestionText,
         ),

@@ -445,12 +445,7 @@ class AppState extends ChangeNotifier {
   }
 
   List<ProjectProgress> get projectProgressList {
-    const palette = [
-      Color(0xFF0E5E6F),
-      Color(0xFF4D7C8A),
-      Color(0xFF6A8E9A),
-      Color(0xFF3B7382),
-    ];
+    const accent = Color(0xFF5E6AD2);
 
     final grouped = <String, List<TaskItem>>{};
     for (final task in _tasks) {
@@ -458,7 +453,6 @@ class AppState extends ChangeNotifier {
     }
 
     final result = <ProjectProgress>[];
-    var index = 0;
     grouped.forEach((projectId, list) {
       final done = list.where((task) => task.done).length;
       final progress = done / list.length;
@@ -468,10 +462,9 @@ class AppState extends ChangeNotifier {
           title: name,
           progress: progress,
           meta: 'Sprint 当前 $done / ${list.length} 任务完成',
-          accent: palette[index % palette.length],
+          accent: accent,
         ),
       );
-      index++;
     });
 
     result.sort((a, b) => b.progress.compareTo(a.progress));

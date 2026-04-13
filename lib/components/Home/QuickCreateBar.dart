@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ottersync/theme/design_tokens.dart';
 
-class HomeQuickAddCard extends StatelessWidget {
-  const HomeQuickAddCard({
+class QuickCreateBar extends StatelessWidget {
+  const QuickCreateBar({
     super.key,
     required this.controller,
     required this.canSubmit,
@@ -16,6 +17,8 @@ class HomeQuickAddCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -26,6 +29,7 @@ class HomeQuickAddCard extends StatelessWidget {
                 controller: controller,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
+                  filled: false,
                   hintText: '快速创建任务并纳入流程跟踪...',
                 ),
                 onChanged: onChanged,
@@ -38,6 +42,10 @@ class HomeQuickAddCard extends StatelessWidget {
             ),
             FilledButton(
               onPressed: canSubmit ? onSubmit : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: palette.brand,
+                foregroundColor: Colors.white,
+              ),
               child: const Text('创建'),
             ),
           ],

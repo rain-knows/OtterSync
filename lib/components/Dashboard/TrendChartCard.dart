@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class DashboardChartCard extends StatelessWidget {
-  const DashboardChartCard({super.key, required this.bars});
+class TrendChartCard extends StatelessWidget {
+  const TrendChartCard({super.key, required this.bars});
 
   final List<double> bars;
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
     const labels = ['一', '二', '三', '四', '五', '六', '日'];
 
     return Card(
@@ -41,7 +42,14 @@ class DashboardChartCard extends StatelessWidget {
                               return Container(
                                 height: 140 * animatedValue,
                                 decoration: BoxDecoration(
-                                  color: AppColors.brand,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      palette.brand,
+                                      palette.brandAccent,
+                                    ],
+                                  ),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               );

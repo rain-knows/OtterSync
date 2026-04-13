@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ottersync/state/app_state.dart';
 
-class DashboardStatusDistributionCard extends StatelessWidget {
-  const DashboardStatusDistributionCard({super.key, required this.appState});
+class StatusBreakdownCard extends StatelessWidget {
+  const StatusBreakdownCard({super.key, required this.appState});
 
   final AppState appState;
 

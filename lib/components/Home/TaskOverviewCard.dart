@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class HomeTaskCard extends StatelessWidget {
-  const HomeTaskCard({super.key, required this.task});
+class TaskOverviewCard extends StatelessWidget {
+  const TaskOverviewCard({super.key, required this.task});
 
   final TaskItem task;
 
@@ -11,10 +11,11 @@ class HomeTaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
     final theme = Theme.of(context);
+    final palette = AppThemePalette.of(context);
     final priorityColor = switch (task.priority) {
-      TaskPriority.high => AppColors.warning,
-      TaskPriority.medium => const Color(0xFF4D7C8A),
-      TaskPriority.low => AppColors.subtitle,
+      TaskPriority.high => palette.warning,
+      TaskPriority.medium => palette.brandAccent,
+      TaskPriority.low => palette.subtitle,
     };
 
     return Card(
@@ -41,25 +42,25 @@ class HomeTaskCard extends StatelessWidget {
                 ),
                 _Tag(
                   text: appState.statusLabel(task.status),
-                  color: const Color(0xFFE7F1F4),
-                  foreground: AppColors.brand,
+                  color: palette.brandSoft,
+                  foreground: palette.brandAccent,
                 ),
                 _Tag(
                   text: task.dueText,
-                  color: const Color(0xFFF1F5F6),
-                  foreground: const Color(0xFF4B5A61),
+                  color: palette.surfaceSecondary.withValues(alpha: 0.5),
+                  foreground: palette.text,
                 ),
                 if (task.isRisk)
                   _Tag(
                     text: '风险',
-                    color: const Color(0xFFFDECEC),
-                    foreground: AppColors.warning,
+                    color: palette.warning.withValues(alpha: 0.14),
+                    foreground: palette.warning,
                   ),
                 if (task.dependencyIds.isNotEmpty)
                   _Tag(
                     text: '依赖 ${task.dependencyIds.length}',
-                    color: const Color(0xFFF1F5F6),
-                    foreground: AppColors.subtitle,
+                    color: palette.surfaceSecondary.withValues(alpha: 0.5),
+                    foreground: palette.subtitle,
                   ),
               ],
             ),
@@ -67,7 +68,7 @@ class HomeTaskCard extends StatelessWidget {
             Text(
               '${appState.projectNameById(task.projectId)} · 负责人 ${appState.memberNameById(task.assigneeId)}',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.subtitle,
+                color: palette.subtitle,
               ),
             ),
             const SizedBox(height: 10),
@@ -106,7 +107,7 @@ class HomeTaskCard extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 '最近记录：${task.history.first.message}',
-                style: const TextStyle(color: AppColors.subtitle, fontSize: 12),
+                style: TextStyle(color: palette.subtitle, fontSize: 12),
               ),
             ],
           ],
@@ -129,10 +130,13 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color,
+        border: Border.all(color: palette.border),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

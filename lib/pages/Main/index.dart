@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ottersync/pages/AI/index.dart';
-import 'package:ottersync/pages/Dashboard/index.dart';
-import 'package:ottersync/pages/Home/index.dart';
-import 'package:ottersync/pages/My/index.dart';
-import 'package:ottersync/pages/Workspace/index.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ottersync/theme/design_tokens.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  const MainPage({super.key, required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -53,34 +52,23 @@ class _MainPageState extends State<MainPage> {
     ),
   ];
 
-  int _currentIndex = 0;
-
-  List<Widget> _getChildren() {
-    return const [
-      HomeView(),
-      WorkspaceView(),
-      AIView(),
-      DashboardView(),
-      MyView(),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+
     return Scaffold(
-      body: SafeArea(
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 280),
-          switchInCurve: Curves.easeOutCubic,
-          switchOutCurve: Curves.easeInCubic,
-          child: KeyedSubtree(
-            key: ValueKey(_currentIndex),
-            child: _getChildren()[_currentIndex],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [palette.panel, palette.canvas],
           ),
         ),
+        child: SafeArea(child: widget.navigationShell),
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
+        selectedIndex: widget.navigationShell.currentIndex,
         destinations: _tabList
             .map(
               (tab) => NavigationDestination(
@@ -91,8 +79,10 @@ class _MainPageState extends State<MainPage> {
             )
             .toList(),
         onDestinationSelected: (int index) {
-          _currentIndex = index;
-          setState(() {});
+          widget.navigationShell.goBranch(
+            index,
+            initialLocation: index == widget.navigationShell.currentIndex,
+          );
         },
       ),
     );

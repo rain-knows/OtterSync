@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class DashboardRiskAndLoadCard extends StatelessWidget {
-  const DashboardRiskAndLoadCard({super.key, required this.appState});
+class RiskLoadPanel extends StatelessWidget {
+  const RiskLoadPanel({super.key, required this.appState});
 
   final AppState appState;
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
     final risks = appState.riskDistribution;
     final loads = appState.memberLoadRatios;
 
@@ -25,17 +26,17 @@ class DashboardRiskAndLoadCard extends StatelessWidget {
                 _RiskChip(
                   label: '高优',
                   value: risks[TaskPriority.high] ?? 0,
-                  color: AppColors.warning,
+                  color: palette.warning,
                 ),
                 _RiskChip(
                   label: '中优',
                   value: risks[TaskPriority.medium] ?? 0,
-                  color: const Color(0xFF4D7C8A),
+                  color: palette.brandAccent,
                 ),
                 _RiskChip(
                   label: '低优',
                   value: risks[TaskPriority.low] ?? 0,
-                  color: AppColors.subtitle,
+                  color: palette.subtitle,
                 ),
               ],
             ),
@@ -57,8 +58,8 @@ class DashboardRiskAndLoadCard extends StatelessWidget {
                         value: index < loads.length ? loads[index] : 0,
                         minHeight: 7,
                         borderRadius: BorderRadius.circular(999),
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.brand,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          palette.brandAccent,
                         ),
                       ),
                     ),
@@ -86,10 +87,13 @@ class _RiskChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
+        border: Border.all(color: palette.border),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(

@@ -8,6 +8,7 @@ description: Use when adding or modifying Flutter code in ottersync and the work
 Use this skill when working on `/Users/themaoqiu/CodeRepo/Android/ottersync` and the goal is to keep the code aligned with the style established by the sibling reference project at `/Users/themaoqiu/CodeRepo/Android/test/test_project/lib`.
 
 Read [references/test_project_style.md](references/test_project_style.md) before making structural changes, creating new pages, or introducing routing.
+Read [references/DESIGN.md](references/DESIGN.md) before creating or modifying any UI. This is mandatory for page visuals, component visuals, theme tokens, spacing, color, typography, buttons, cards, pills, navigation, and dark/light theme decisions.
 
 ## First read
 
@@ -16,6 +17,7 @@ Inspect these files first because they define the current app shell:
 - `lib/main.dart`
 - `lib/routes/index.dart`
 - `lib/pages/Main/index.dart`
+- `skills/ottersync-flutter-style/references/DESIGN.md` for any UI-facing work
 
 If the task is feature-specific, then inspect only the matching page folder and any directly related components.
 
@@ -33,7 +35,9 @@ Follow the reference project's naming pattern:
 - A page lives at `lib/pages/<Feature>/index.dart`
 - A component group lives at `lib/components/<Feature>/...`
 - Directory names are PascalCase
-- File names inside feature component groups may also stay PascalCase if that matches nearby code
+- In this repo, component file names under `lib/components/` should stay PascalCase when they represent named UI blocks, for example `HeroSection.dart`, `SectionHeader.dart`, `TrendChartCard.dart`
+- Prefer component names that read like frontend UI building blocks rather than domain records, for example `HeroSection`, `SummaryPanel`, `ChatBubble`, `SettingsOptionTile`
+- It is acceptable for `pages/` to keep `index.dart`, while `components/` use explicit PascalCase file names
 
 Do not introduce deep feature nesting unless the current task clearly needs it. This style is intentionally shallow and easy to scan.
 
@@ -49,6 +53,8 @@ Default preferences:
 - Use private helper classes for local UI metadata, such as `_TabItem`
 - Keep route builders and page containers simple; do not hide basic navigation structure behind extra abstraction
 - Use Chinese copy if the surrounding UI already uses Chinese labels
+- Prefer UI-oriented component names such as `Header`, `Section`, `Card`, `Panel`, `Tile`, `Item`, `Bar`, `Banner`
+- Avoid underscored component file names in `lib/components/` unless the local folder already clearly uses another convention
 
 Widget conventions from the reference project:
 
@@ -58,6 +64,33 @@ Widget conventions from the reference project:
 - Naming usually ends with `Page` for full pages and `View` for tab content
 
 Do not "upgrade" older files just for style cleanup. Match the local area you are editing. If the current ottersync file already uses a slightly more polished Material 3 style, keep that level of finish while preserving the same folder split and page organization.
+
+## UI design rules
+
+For any UI work, `skills/ottersync-flutter-style/references/DESIGN.md` is the source of truth.
+
+- Always read `skills/ottersync-flutter-style/references/DESIGN.md` before changing page layout, colors, typography, cards, buttons, inputs, chips, navigation, or theme tokens
+- Prefer reusing or extending shared theme tokens instead of hardcoding one-off colors, spacing, radii, or text styles
+- Default to implementing UI through the project theme and shared design tokens first, then page/component code second
+- Keep new visuals consistent with the design direction in `skills/ottersync-flutter-style/references/DESIGN.md`, especially dark-first surfaces, restrained accent usage, subtle borders, and typographic hierarchy
+- If an existing screen conflicts with `skills/ottersync-flutter-style/references/DESIGN.md`, move the edited area toward that document instead of copying the older local style
+- Do not introduce a new visual style direction unless the user explicitly asks to diverge from `skills/ottersync-flutter-style/references/DESIGN.md`
+- When adding light mode support, derive it from the same token system and keep component roles consistent across themes
+
+## Naming guidance
+
+When creating or renaming reusable UI blocks in `lib/components/`:
+
+- Favor PascalCase file names and exported widget class names
+- Prefer names that describe what the user sees on screen, such as `HomeHeroSection`, `ProjectOverviewCard`, `WorkspaceOverviewBanner`
+- Use suffixes intentionally:
+  - `Section` for large content bands
+  - `Header` for section headings or top summaries
+  - `Card` for surfaced content blocks
+  - `Panel` for denser grouped information
+  - `Tile` or `Item` for list rows
+  - `Bar` for compact interactive strips such as search/input/create areas
+- Avoid vague names like `Widget1`, `Block`, `Part`, or overly backend-flavored names for pure UI components
 
 ## Routing guidance
 

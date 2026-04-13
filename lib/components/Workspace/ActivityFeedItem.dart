@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class WorkspaceActivityTile extends StatelessWidget {
-  const WorkspaceActivityTile({
-    super.key,
-    required this.title,
-    required this.time,
-  });
+class ActivityFeedItem extends StatelessWidget {
+  const ActivityFeedItem({super.key, required this.title, required this.time});
 
   final String title;
   final String time;
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 6),
-      leading: const CircleAvatar(
-        backgroundColor: AppColors.brandSoft,
-        child: Icon(Icons.bolt_rounded, color: AppColors.brand),
+      leading: CircleAvatar(
+        backgroundColor: palette.brandSoft,
+        child: Icon(Icons.bolt_rounded, color: palette.brandAccent),
       ),
       title: Text(title),
       subtitle: Text(time),

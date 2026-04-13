@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class DashboardSummaryCard extends StatelessWidget {
-  const DashboardSummaryCard({
+class SummaryPanel extends StatelessWidget {
+  const SummaryPanel({
     super.key,
     required this.summaryText,
     required this.suggestionText,
@@ -13,6 +13,8 @@ class DashboardSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -23,7 +25,7 @@ class DashboardSummaryCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               suggestionText,
-              style: const TextStyle(color: AppColors.subtitle, height: 1.6),
+              style: TextStyle(color: palette.subtitle, height: 1.6),
             ),
           ],
         ),

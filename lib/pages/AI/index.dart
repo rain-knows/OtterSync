@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ottersync/components/AI/ai_bubble.dart';
-import 'package:ottersync/components/AI/ai_hero.dart';
-import 'package:ottersync/components/AI/ai_input_bar.dart';
+import 'package:ottersync/components/AI/AIHeroSection.dart';
+import 'package:ottersync/components/AI/ChatBubble.dart';
+import 'package:ottersync/components/AI/ChatInputBar.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
@@ -30,6 +30,7 @@ class _AIViewState extends State<AIView> {
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
+    final palette = AppThemePalette.of(context);
 
     return Column(
       children: [
@@ -37,7 +38,7 @@ class _AIViewState extends State<AIView> {
           child: ListView(
             padding: AppSpace.pagePadding,
             children: [
-              const AIHero(),
+              const AIHeroSection(),
               const SizedBox(height: 20),
               Wrap(
                 spacing: 10,
@@ -56,7 +57,13 @@ class _AIViewState extends State<AIView> {
                     .toList(),
               ),
               const SizedBox(height: 20),
-              const Text('执行建议', style: TextStyle(fontWeight: FontWeight.w700)),
+              Text(
+                '执行建议',
+                style: TextStyle(
+                  color: palette.title,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 10),
               if (appState.suggestions.isEmpty)
                 const Card(
@@ -73,11 +80,15 @@ class _AIViewState extends State<AIView> {
                       title: Text(item.title),
                       subtitle: Text(item.description),
                       trailing: item.executed
-                          ? const Text(
+                          ? Text(
                               '已执行',
-                              style: TextStyle(color: AppColors.success),
+                              style: TextStyle(color: palette.success),
                             )
                           : FilledButton.tonal(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: palette.brandSoft,
+                                foregroundColor: palette.brandAccent,
+                              ),
                               onPressed: () =>
                                   appState.executeSuggestion(item.id),
                               child: const Text('确认执行'),
@@ -87,14 +98,15 @@ class _AIViewState extends State<AIView> {
                 ),
               const SizedBox(height: 10),
               ...appState.aiMessages.map(
-                (message) => AIBubble(isMe: message.isMine, text: message.text),
+                (message) =>
+                    ChatBubble(isMe: message.isMine, text: message.text),
               ),
             ],
           ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
-          child: AIInputBar(
+          child: ChatInputBar(
             controller: _controller,
             onChanged: (_) => setState(() {}),
             onSend: () => _send(appState),

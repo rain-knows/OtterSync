@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:ottersync/state/app_state.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class HomeLayerCard extends StatelessWidget {
-  const HomeLayerCard({super.key, required this.layer});
+class LayerProgressCard extends StatelessWidget {
+  const LayerProgressCard({super.key, required this.layer});
 
   final CompletionLayer layer;
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppThemePalette.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -39,19 +41,15 @@ class HomeLayerCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(top: 6),
-                      child: Icon(
-                        Icons.circle,
-                        size: 6,
-                        color: AppColors.subtitle,
-                      ),
+                      child: Icon(Icons.circle, size: 6, color: palette.muted),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         item,
-                        style: const TextStyle(color: AppColors.subtitle),
+                        style: TextStyle(color: palette.subtitle),
                       ),
                     ),
                   ],
