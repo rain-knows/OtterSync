@@ -2,53 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends StatelessWidget {
   const MainPage({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
-  @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _TabItem {
-  const _TabItem({
-    required this.icon,
-    required this.selectedIcon,
-    required this.text,
-  });
-
-  final IconData icon;
-  final IconData selectedIcon;
-  final String text;
-}
-
-class _MainPageState extends State<MainPage> {
-  final List<_TabItem> _tabList = const [
+  static const _tabs = [
+    _TabItem('主页', Icons.home_outlined, Icons.home_rounded),
+    _TabItem('空间', Icons.public_outlined, Icons.public_rounded),
     _TabItem(
-      icon: Icons.dashboard_outlined,
-      selectedIcon: Icons.dashboard_rounded,
-      text: '项目',
+      '所有工作',
+      Icons.library_add_check_outlined,
+      Icons.library_add_check_rounded,
     ),
+    _TabItem('仪表板', Icons.dashboard_outlined, Icons.dashboard_rounded),
     _TabItem(
-      icon: Icons.groups_2_outlined,
-      selectedIcon: Icons.groups_2_rounded,
-      text: '工作区',
-    ),
-    _TabItem(
-      icon: Icons.auto_awesome_outlined,
-      selectedIcon: Icons.auto_awesome_rounded,
-      text: 'AI',
-    ),
-    _TabItem(
-      icon: Icons.analytics_outlined,
-      selectedIcon: Icons.analytics_rounded,
-      text: '分析',
-    ),
-    _TabItem(
-      icon: Icons.person_outline,
-      selectedIcon: Icons.person_rounded,
-      text: '我的',
+      '通知',
+      Icons.notifications_none_rounded,
+      Icons.notifications_rounded,
     ),
   ];
 
@@ -57,34 +28,40 @@ class _MainPageState extends State<MainPage> {
     final palette = AppThemePalette.of(context);
 
     return Scaffold(
-      body: Container(
+      body: SafeArea(child: navigationShell),
+      bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [palette.panel, palette.canvas],
-          ),
+          color: palette.scaffold,
+          border: Border(top: BorderSide(color: palette.divider)),
         ),
-        child: SafeArea(child: widget.navigationShell),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: widget.navigationShell.currentIndex,
-        destinations: _tabList
-            .map(
-              (tab) => NavigationDestination(
-                icon: Icon(tab.icon),
-                selectedIcon: Icon(tab.selectedIcon),
-                label: tab.text,
-              ),
-            )
-            .toList(),
-        onDestinationSelected: (int index) {
-          widget.navigationShell.goBranch(
-            index,
-            initialLocation: index == widget.navigationShell.currentIndex,
-          );
-        },
+        child: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          backgroundColor: palette.scaffold,
+          destinations: _tabs
+              .map(
+                (tab) => NavigationDestination(
+                  icon: Icon(tab.icon),
+                  selectedIcon: Icon(tab.selectedIcon),
+                  label: tab.label,
+                ),
+              )
+              .toList(),
+          onDestinationSelected: (index) {
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
+          },
+        ),
       ),
     );
   }
+}
+
+class _TabItem {
+  const _TabItem(this.label, this.icon, this.selectedIcon);
+
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
 }

@@ -1,88 +1,99 @@
 import 'package:flutter/material.dart';
 
 class AppPalette {
-  final Color brand;
-  final Color brandAccent;
-  final Color brandHover;
-  final Color brandSoft;
-  final Color canvas;
-  final Color panel;
-  final Color surface;
-  final Color surfaceSecondary;
-  final Color title;
-  final Color text;
-  final Color subtitle;
-  final Color muted;
-  final Color success;
-  final Color warning;
-  final Color borderSubtle;
-  final Color border;
-  final Color borderStrong;
-  final Color overlay;
-
   const AppPalette({
-    required this.brand,
-    required this.brandAccent,
-    required this.brandHover,
-    required this.brandSoft,
-    required this.canvas,
-    required this.panel,
+    required this.primary,
+    required this.primarySoft,
+    required this.primaryStrong,
+    required this.scaffold,
     required this.surface,
-    required this.surfaceSecondary,
-    required this.title,
-    required this.text,
-    required this.subtitle,
-    required this.muted,
+    required this.surfaceRaised,
+    required this.surfaceInset,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textTertiary,
+    required this.border,
+    required this.divider,
     required this.success,
     required this.warning,
-    required this.borderSubtle,
-    required this.border,
-    required this.borderStrong,
-    required this.overlay,
+    required this.danger,
+    required this.avatar,
+    required this.shadow,
   });
+
+  final Color primary;
+  final Color primarySoft;
+  final Color primaryStrong;
+  final Color scaffold;
+  final Color surface;
+  final Color surfaceRaised;
+  final Color surfaceInset;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textTertiary;
+  final Color border;
+  final Color divider;
+  final Color success;
+  final Color warning;
+  final Color danger;
+  final Color avatar;
+  final Color shadow;
+
+  Color get brand => primary;
+  Color get brandSoft => primarySoft;
+  Color get brandAccent => primaryStrong;
+  Color get brandHover => primaryStrong;
+  Color get canvas => scaffold;
+  Color get panel => surface;
+  Color get surfaceSecondary => surfaceRaised;
+  Color get title => textPrimary;
+  Color get text => textSecondary;
+  Color get subtitle => textSecondary;
+  Color get muted => textTertiary;
+  Color get borderSubtle => divider;
+  Color get borderStrong => border;
+  Color get overlay => shadow;
 }
 
 abstract final class AppColors {
-  static const dark = AppPalette(
-    brand: Color(0xFF5E6AD2),
-    brandAccent: Color(0xFF7170FF),
-    brandHover: Color(0xFF828FFF),
-    brandSoft: Color(0x1A7170FF),
-    canvas: Color(0xFF08090A),
-    panel: Color(0xFF0F1011),
-    surface: Color(0xFF191A1B),
-    surfaceSecondary: Color(0xFF28282C),
-    title: Color(0xFFF7F8F8),
-    text: Color(0xFFD0D6E0),
-    subtitle: Color(0xFF8A8F98),
-    muted: Color(0xFF62666D),
-    success: Color(0xFF10B981),
-    warning: Color(0xFFE86B6B),
-    borderSubtle: Color(0x0DFFFFFF),
-    border: Color(0x14FFFFFF),
-    borderStrong: Color(0x1FFFFFFF),
-    overlay: Color(0xD9000000),
+  static const light = AppPalette(
+    primary: Color(0xFF0C66E4),
+    primarySoft: Color(0xFFE9F2FF),
+    primaryStrong: Color(0xFF0055CC),
+    scaffold: Color(0xFFF4F5F7),
+    surface: Color(0xFFFFFFFF),
+    surfaceRaised: Color(0xFFF7F8F9),
+    surfaceInset: Color(0xFFF1F2F4),
+    textPrimary: Color(0xFF172B4D),
+    textSecondary: Color(0xFF626F86),
+    textTertiary: Color(0xFF8993A4),
+    border: Color(0xFFDDE1E6),
+    divider: Color(0xFFEBECF0),
+    success: Color(0xFF22A06B),
+    warning: Color(0xFFCA3521),
+    danger: Color(0xFFAE2E24),
+    avatar: Color(0xFF12B5CB),
+    shadow: Color(0x12091E42),
   );
 
-  static const light = AppPalette(
-    brand: Color(0xFF5E6AD2),
-    brandAccent: Color(0xFF5B63E6),
-    brandHover: Color(0xFF4F57D6),
-    brandSoft: Color(0x145E6AD2),
-    canvas: Color(0xFFF6F7FB),
-    panel: Color(0xFFFFFFFF),
-    surface: Color(0xFFFFFFFF),
-    surfaceSecondary: Color(0xFFE9ECF4),
-    title: Color(0xFF16181D),
-    text: Color(0xFF3E4653),
-    subtitle: Color(0xFF697180),
-    muted: Color(0xFF8D94A3),
-    success: Color(0xFF1F9D63),
-    warning: Color(0xFFD95C5C),
-    borderSubtle: Color(0x0D0F172A),
-    border: Color(0x14111827),
-    borderStrong: Color(0x22111827),
-    overlay: Color(0xA6000000),
+  static const dark = AppPalette(
+    primary: Color(0xFF579DFF),
+    primarySoft: Color(0xFF1C2B41),
+    primaryStrong: Color(0xFF85B8FF),
+    scaffold: Color(0xFF111214),
+    surface: Color(0xFF1D2125),
+    surfaceRaised: Color(0xFF22272B),
+    surfaceInset: Color(0xFF161A1D),
+    textPrimary: Color(0xFFD7DBDF),
+    textSecondary: Color(0xFF8C9BAB),
+    textTertiary: Color(0xFF738496),
+    border: Color(0xFF2C333A),
+    divider: Color(0xFF262C33),
+    success: Color(0xFF4BCE97),
+    warning: Color(0xFFF5CD47),
+    danger: Color(0xFFF87168),
+    avatar: Color(0xFF12B5CB),
+    shadow: Color(0x33000000),
   );
 }
 
@@ -95,28 +106,38 @@ abstract final class AppThemePalette {
 }
 
 abstract final class AppSpace {
-  static const pagePadding = EdgeInsets.fromLTRB(20, 16, 20, 24);
-  static const sectionGap = SizedBox(height: 20);
-  static const cardRadius = 22.0;
-  static const pillRadius = 999.0;
+  static const EdgeInsets pagePadding = EdgeInsets.fromLTRB(16, 14, 16, 24);
+  static const EdgeInsets pagePaddingWithNav = EdgeInsets.fromLTRB(
+    16,
+    14,
+    16,
+    112,
+  );
+  static const double radiusSmall = 8;
+  static const double radius = 12;
+  static const double radiusLarge = 16;
+  static const double radiusFull = 999;
+  static const double cardRadius = radiusLarge;
+  static const double pillRadius = radiusFull;
 }
 
 abstract final class AppDecorations {
-  static BoxDecoration panel({
-    required AppPalette palette,
-    BorderRadius? radius,
+  static BoxDecoration surface(
+    BuildContext context, {
+    double radius = AppSpace.radiusLarge,
     Color? color,
     Border? border,
   }) {
+    final palette = AppThemePalette.of(context);
     return BoxDecoration(
-      color: color ?? palette.surface.withValues(alpha: 0.9),
-      borderRadius: radius ?? BorderRadius.circular(AppSpace.cardRadius),
+      color: color ?? palette.surface,
+      borderRadius: BorderRadius.circular(radius),
       border: border ?? Border.all(color: palette.border),
-      boxShadow: const [
+      boxShadow: [
         BoxShadow(
-          color: Color(0x33000000),
-          blurRadius: 24,
-          offset: Offset(0, 12),
+          color: palette.shadow,
+          blurRadius: 18,
+          offset: const Offset(0, 6),
         ),
       ],
     );

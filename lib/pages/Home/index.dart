@@ -1,132 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ottersync/components/Common/SectionHeader.dart';
-import 'package:ottersync/components/Home/HomeHeroSection.dart';
-import 'package:ottersync/components/Home/LayerProgressCard.dart';
-import 'package:ottersync/components/Home/ProjectOverviewCard.dart';
-import 'package:ottersync/components/Home/QuickCreateBar.dart';
-import 'package:ottersync/components/Home/TaskOverviewCard.dart';
-import 'package:ottersync/state/app_state.dart';
+import 'package:ottersync/components/Common/UserAvatar.dart';
+import 'package:ottersync/components/Common/demo_feedback.dart';
+import 'package:ottersync/components/Home/HomeOverviewCard.dart';
+import 'package:ottersync/components/Home/QuickAccessSection.dart';
+import 'package:ottersync/components/Home/RecentProjectsCard.dart';
 import 'package:ottersync/theme/design_tokens.dart';
+import 'package:ottersync/viewmodels/jira_demo_data.dart';
 
-enum _TaskFilter { all, pending, completed, risk }
-
-class HomeView extends StatefulWidget {
+class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  _TaskFilter _filter = _TaskFilter.pending;
-  final TextEditingController _quickAddController = TextEditingController();
-  bool _canQuickAdd = false;
-
-  @override
-  void dispose() {
-    _quickAddController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final appState = AppStateScope.of(context);
-    final tasks = switch (_filter) {
-      _TaskFilter.all => appState.tasks,
-      _TaskFilter.pending =>
-        appState.tasks.where((task) => !task.done).toList(),
-      _TaskFilter.completed =>
-        appState.tasks.where((task) => task.done).toList(),
-      _TaskFilter.risk =>
-        appState.tasks.where((task) => !task.done && task.isRisk).toList(),
-    };
+    final palette = AppThemePalette.of(context);
+    final theme = Theme.of(context);
 
     return ListView(
-      padding: AppSpace.pagePadding,
+      padding: AppSpace.pagePaddingWithNav,
       children: [
-        HomeHeroSection(appState: appState),
-        const SizedBox(height: 20),
-        const SectionHeader(title: '完成度分层验收'),
-        const SizedBox(height: 12),
-        ...appState.completionLayers.map(
-          (layer) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: LayerProgressCard(layer: layer),
-          ),
-        ),
-        const SizedBox(height: 8),
-        const SectionHeader(title: '项目推进'),
-        const SizedBox(height: 12),
-        ...appState.projectProgressList.map(
-          (project) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: ProjectOverviewCard(
-              title: project.title,
-              progress: project.progress,
-              meta: project.meta,
-              accent: project.accent,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        const SectionHeader(title: '任务流程闭环'),
-        const SizedBox(height: 12),
-        QuickCreateBar(
-          controller: _quickAddController,
-          canSubmit: _canQuickAdd,
-          onChanged: (value) =>
-              setState(() => _canQuickAdd = value.trim().isNotEmpty),
-          onSubmit: () {
-            final created = appState.addTask(_quickAddController.text);
-            if (created) {
-              _quickAddController.clear();
-              setState(() => _canQuickAdd = false);
-            }
-          },
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
+        Row(
           children: [
-            FilterChip(
-              label: const Text('全部'),
-              selected: _filter == _TaskFilter.all,
-              onSelected: (_) => setState(() => _filter = _TaskFilter.all),
+            InkWell(
+              onTap: () => context.push('/account'),
+              borderRadius: BorderRadius.circular(999),
+              child: const UserAvatar(label: 'MT'),
             ),
-            FilterChip(
-              label: const Text('进行中'),
-              selected: _filter == _TaskFilter.pending,
-              onSelected: (_) => setState(() => _filter = _TaskFilter.pending),
-            ),
-            FilterChip(
-              label: const Text('已完成'),
-              selected: _filter == _TaskFilter.completed,
-              onSelected: (_) =>
-                  setState(() => _filter = _TaskFilter.completed),
-            ),
-            FilterChip(
-              label: const Text('风险'),
-              selected: _filter == _TaskFilter.risk,
-              onSelected: (_) => setState(() => _filter = _TaskFilter.risk),
+            const Spacer(),
+            IconButton(
+              onPressed: () => showDemoFeedback(context, '创建工作项接口已预留。'),
+              icon: Icon(
+                Icons.add_rounded,
+                color: palette.textSecondary,
+                size: 34,
+              ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        if (tasks.isEmpty)
-          const Card(
-            child: Padding(
-              padding: EdgeInsets.all(18),
-              child: Text('当前筛选下暂无任务。'),
+        const SizedBox(height: 18),
+        TextField(
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.search_rounded,
+              color: palette.textSecondary,
+              size: 34,
             ),
-          )
-        else
-          ...tasks.map(
-            (task) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: TaskOverviewCard(task: task),
+            hintText: '搜索',
+            fillColor: palette.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28),
+              borderSide: BorderSide(color: palette.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28),
+              borderSide: BorderSide(color: palette.border),
             ),
           ),
+        ),
+        const SizedBox(height: 26),
+        SectionHeader(
+          title: '今日概述',
+          action: Icon(
+            Icons.expand_more_rounded,
+            color: palette.textPrimary,
+            size: 34,
+          ),
+        ),
+        const SizedBox(height: 16),
+        HomeOverviewCard(
+          onCopy: () => showDemoFeedback(context, '摘要内容复制接口已预留。'),
+          onLike: () => showDemoFeedback(context, '反馈提交接口已预留。'),
+          onDislike: () => showDemoFeedback(context, '反馈提交接口已预留。'),
+          onMore: () => showDemoFeedback(context, '更多动态接口已预留。'),
+        ),
+        const SizedBox(height: 28),
+        SectionHeader(
+          title: '快速访问',
+          action: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '编辑',
+                style: TextStyle(color: palette.primary, fontSize: 16),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.expand_more_rounded,
+                color: palette.textPrimary,
+                size: 28,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        QuickAccessSection(
+          items: JiraDemoData.homeQuickAccess,
+          onItemTap: (item) {
+            if (item.route != null) {
+              context.push(item.route!);
+              return;
+            }
+            showDemoFeedback(context, '${item.title} 交互入口已预留。');
+          },
+        ),
+        const SizedBox(height: 28),
+        SectionHeader(
+          title: '最近项目',
+          action: Icon(
+            Icons.expand_more_rounded,
+            color: palette.textPrimary,
+            size: 34,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          '今天',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: palette.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 10),
+        RecentProjectsCard(
+          items: JiraDemoData.recentProjects,
+          onItemTap: (item) =>
+              showDemoFeedback(context, '将打开 ${item.key} 的详情页。'),
+        ),
       ],
     );
   }

@@ -1,194 +1,167 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ottersync/pages/AI/index.dart';
+import 'package:ottersync/pages/Account/index.dart';
+import 'package:ottersync/pages/AllWork/index.dart';
 import 'package:ottersync/pages/Dashboard/index.dart';
 import 'package:ottersync/pages/Home/index.dart';
 import 'package:ottersync/pages/Main/index.dart';
-import 'package:ottersync/pages/My/index.dart';
-import 'package:ottersync/pages/Workspace/index.dart';
-import 'package:ottersync/state/app_state.dart';
+import 'package:ottersync/pages/Notifications/index.dart';
+import 'package:ottersync/pages/SpaceDetails/index.dart';
+import 'package:ottersync/pages/Spaces/index.dart';
 import 'package:ottersync/state/theme_controller.dart';
 import 'package:ottersync/theme/design_tokens.dart';
 
 ThemeData _buildAppTheme(AppPalette palette, Brightness brightness) {
-  return ThemeData(
+  final base = ThemeData(
     useMaterial3: true,
     brightness: brightness,
-    colorScheme:
-        ColorScheme.fromSeed(
-          seedColor: palette.brand,
-          brightness: brightness,
-        ).copyWith(
-          primary: palette.brand,
-          secondary: palette.brandAccent,
-          surface: palette.surface,
-        ),
-    scaffoldBackgroundColor: palette.canvas,
-    fontFamily: 'Inter',
-    appBarTheme: AppBarTheme(
-      centerTitle: false,
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      foregroundColor: palette.title,
+    scaffoldBackgroundColor: palette.scaffold,
+  );
+
+  return base.copyWith(
+    colorScheme: ColorScheme(
+      brightness: brightness,
+      primary: palette.primary,
+      onPrimary: Colors.white,
+      secondary: palette.primaryStrong,
+      onSecondary: Colors.white,
+      error: palette.danger,
+      onError: Colors.white,
+      surface: palette.surface,
+      onSurface: palette.textPrimary,
     ),
-    dividerColor: palette.border,
+    appBarTheme: AppBarTheme(
+      backgroundColor: palette.scaffold,
+      foregroundColor: palette.textPrimary,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+    ),
+    cardTheme: CardThemeData(
+      color: palette.surface,
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpace.radiusLarge),
+        side: BorderSide(color: palette.border),
+      ),
+    ),
+    dividerColor: palette.divider,
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: palette.scaffold,
+      height: 82,
+      labelTextStyle: WidgetStatePropertyAll(
+        TextStyle(
+          color: palette.textSecondary,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      indicatorColor: palette.primarySoft,
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
+        return IconThemeData(
+          color: selected ? palette.primary : palette.textSecondary,
+          size: 30,
+        );
+      }),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: palette.scaffold,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpace.radiusLarge),
+        ),
+      ),
+    ),
     textTheme: TextTheme(
-      headlineSmall: TextStyle(
-        color: palette.title,
-        fontSize: 32,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.7,
-        height: 1.05,
+      headlineLarge: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 40,
+        fontWeight: FontWeight.w300,
+        letterSpacing: -1.1,
+      ),
+      headlineMedium: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 24,
+        fontWeight: FontWeight.w400,
       ),
       titleLarge: TextStyle(
-        color: palette.title,
-        fontSize: 24,
-        fontWeight: FontWeight.w500,
-        letterSpacing: -0.3,
-      ),
-      titleMedium: TextStyle(
-        color: palette.title,
+        color: palette.textPrimary,
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        letterSpacing: -0.2,
       ),
-      titleSmall: TextStyle(
-        color: palette.title,
+      titleMedium: TextStyle(
+        color: palette.textPrimary,
         fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
-      bodyLarge: TextStyle(color: palette.text, fontSize: 16, height: 1.5),
-      bodyMedium: TextStyle(color: palette.text, fontSize: 15, height: 1.6),
+      bodyLarge: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        color: palette.textSecondary,
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
       bodySmall: TextStyle(
-        color: palette.subtitle,
-        fontSize: 13,
-        height: 1.5,
-        letterSpacing: -0.13,
-      ),
-      labelLarge: TextStyle(color: palette.title, fontWeight: FontWeight.w600),
-      labelMedium: TextStyle(
-        color: palette.text,
+        color: palette.textTertiary,
         fontSize: 12,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-    cardTheme: CardThemeData(
-      color: palette.surface.withValues(alpha: 0.88),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpace.cardRadius),
-        side: BorderSide(color: palette.border),
+        fontWeight: FontWeight.w400,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: palette.surface.withValues(alpha: 0.5),
-      hintStyle: TextStyle(color: palette.muted),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      fillColor: palette.surface,
+      hintStyle: TextStyle(color: palette.textSecondary, fontSize: 14),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpace.radius),
         borderSide: BorderSide(color: palette.border),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpace.radius),
         borderSide: BorderSide(color: palette.border),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: palette.brandAccent),
-      ),
-    ),
-    chipTheme: ChipThemeData(
-      backgroundColor: palette.surface,
-      selectedColor: palette.brandSoft,
-      disabledColor: palette.surface,
-      side: BorderSide(color: palette.border),
-      labelStyle: TextStyle(color: palette.text, fontSize: 13),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        backgroundColor: palette.brand,
-        foregroundColor: Colors.white,
-        disabledBackgroundColor: palette.surfaceSecondary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: palette.text,
-        side: BorderSide(color: palette.borderStrong),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        borderRadius: BorderRadius.circular(AppSpace.radius),
+        borderSide: BorderSide(color: palette.primary),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: palette.brandAccent,
-        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        foregroundColor: palette.primary,
+        textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
       ),
     ),
-    listTileTheme: ListTileThemeData(
-      iconColor: palette.text,
-      textColor: palette.title,
-      subtitleTextStyle: TextStyle(color: palette.subtitle, height: 1.5),
-    ),
-    progressIndicatorTheme: ProgressIndicatorThemeData(
-      color: palette.brandAccent,
-      linearTrackColor: palette.surfaceSecondary,
-    ),
-    navigationBarTheme: NavigationBarThemeData(
-      height: 72,
-      backgroundColor: palette.panel.withValues(alpha: 0.96),
-      indicatorColor: palette.brandSoft,
-      surfaceTintColor: Colors.transparent,
-      labelTextStyle: WidgetStateProperty.all(
-        TextStyle(fontWeight: FontWeight.w600, color: palette.text),
-      ),
-      iconTheme: WidgetStateProperty.resolveWith((states) {
-        final selected = states.contains(WidgetState.selected);
-        return IconThemeData(
-          color: selected ? palette.title : palette.subtitle,
-        );
-      }),
-    ),
-    textSelectionTheme: TextSelectionThemeData(
-      cursorColor: palette.brandAccent,
-      selectionColor: palette.brandSoft,
-    ),
-    splashColor: palette.brandSoft,
-    highlightColor: Colors.transparent,
-    bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: palette.panel,
-      surfaceTintColor: Colors.transparent,
-    ),
-    dialogTheme: DialogThemeData(
-      backgroundColor: palette.panel,
-      surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpace.cardRadius),
-        side: BorderSide(color: palette.border),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: palette.primary,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpace.radius),
+        ),
       ),
     ),
   );
 }
 
-final AppState _appState = AppState();
 final ThemeController _themeController = ThemeController();
+
 final GoRouter _rootRouter = GoRouter(
-  initialLocation: '/projects',
+  initialLocation: '/home',
   routes: [
-    GoRoute(path: '/', redirect: (context, state) => '/projects'),
+    GoRoute(path: '/', redirect: (context, state) => '/home'),
     StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) {
-        return MainPage(navigationShell: navigationShell);
-      },
+      builder: (context, state, navigationShell) =>
+          MainPage(navigationShell: navigationShell),
       branches: [
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/projects',
-              name: 'projects',
+              path: '/home',
               builder: (context, state) => const HomeView(),
             ),
           ],
@@ -196,26 +169,23 @@ final GoRouter _rootRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/workspace',
-              name: 'workspace',
-              builder: (context, state) => const WorkspaceView(),
+              path: '/spaces',
+              builder: (context, state) => const SpacesView(),
             ),
           ],
         ),
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/ai',
-              name: 'ai',
-              builder: (context, state) => const AIView(),
+              path: '/all-work',
+              builder: (context, state) => const AllWorkView(),
             ),
           ],
         ),
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/dashboard',
-              name: 'dashboard',
+              path: '/dashboards',
               builder: (context, state) => const DashboardView(),
             ),
           ],
@@ -223,34 +193,35 @@ final GoRouter _rootRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/my',
-              name: 'my',
-              builder: (context, state) => const MyView(),
+              path: '/notifications',
+              builder: (context, state) => const NotificationsView(),
             ),
           ],
         ),
       ],
     ),
+    GoRoute(path: '/account', builder: (context, state) => const AccountView()),
+    GoRoute(
+      path: '/space-details',
+      builder: (context, state) => const SpaceDetailsView(),
+    ),
   ],
 );
 
 Widget getRootWidget() {
-  return AppStateScope(
-    notifier: _appState,
-    child: ThemeControllerScope(
-      notifier: _themeController,
-      child: AnimatedBuilder(
-        animation: _themeController,
-        builder: (context, child) {
-          return MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            theme: _buildAppTheme(AppColors.light, Brightness.light),
-            darkTheme: _buildAppTheme(AppColors.dark, Brightness.dark),
-            themeMode: _themeController.themeMode,
-            routerConfig: _rootRouter,
-          );
-        },
-      ),
+  return ThemeControllerScope(
+    notifier: _themeController,
+    child: AnimatedBuilder(
+      animation: _themeController,
+      builder: (context, child) {
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: _buildAppTheme(AppColors.light, Brightness.light),
+          darkTheme: _buildAppTheme(AppColors.dark, Brightness.dark),
+          themeMode: _themeController.themeMode,
+          routerConfig: _rootRouter,
+        );
+      },
     ),
   );
 }
